@@ -43,11 +43,8 @@ int main()
 		}
 		cout << "Done load test data" << endl;
 	}	
-
 	
-	sortP(trainP, TR_SIZE, 0);
-
-
+	KDTree trainTree;
 	
 
 
@@ -58,23 +55,4 @@ int main()
 
 	getchar();
 	return 0;
-}
-
-
-void sortP(Point2D *P, int n,int m)
-{
-	//x: m = 0 , y: m=1
-	Point2D temp;
-	for (int i = n; i > 0 ; i--)
-	{
-		for (int j = 0; j < i; j++)
-		{			
-			if ((P[j])[m] < (P[j + 1])[m])
-			{
-				temp = (P[j]);
-				(P[j]) = (P[j + 1]);
-				(P[j + 1]) = temp;
-			}
-		}
-	}
 }
