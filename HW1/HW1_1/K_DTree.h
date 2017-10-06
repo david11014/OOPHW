@@ -22,19 +22,16 @@ public:
 
 };
 
-class node {
+class Node {
 
 public:
-	node* up;
-	node* child[2] = {nullptr};
-	Point2D* P;
+	Node* up;
+	Node* child[2] = {nullptr};
+	Point2D P;
 	int layer;
-	node() {		
-		P = nullptr;
-	}
-	node(node* u)
-	{		
-		P = nullptr;
+	Node() {}
+	Node(Node* u)
+	{
 		up = u;
 	}
 };
@@ -42,27 +39,53 @@ public:
 class KDTree {
 
 public:
-	node Root;
+	Node *Root;
 
-	KDTree() {
-		Root.layer = 0;
+	KDTree()
+	{
+		Root = new Node;
+		Root->layer = 0;
 	}
 
-	void Add(node* pa, Point2D *P,int i)
+	Node* Add(Node* pa, Point2D *P,int i)
 	{
-		node *N = new node(pa);
-		N->P = P;
+		Node *N = new Node;
+		N->P = *P;
+		N->layer = pa->layer + 1;
 		pa->child[i] = N;
+
+		return N;
 	}
 
-	void MakeTree(node *parrent, Point2D * start, Point2D *end)
+	void MakeTree(Node *parrent, Point2D * start, Point2D *end,int i)
 	{
+		int n = (end - start);
+		
+		if (n == 1)
+		{
+			Add(parrent, start, i);
+			return;
+		}
+		else if (n < 1)
+		{
+			return;
+		}
+		else
+		{				
+			int mid = (int)(n / 2);
+			SortP(start, n, i);
+			Node *N = Add(parrent, start + mid, i);
 
+			MakeTree(N, start, start + mid, 0);
+			MakeTree(N, start + mid + 1, end, 1);
+
+		}
+		
+		return;
 	}
 
 private:
-	void SortP(Point2D *P, int n, int m)
-	{
+	void SortP(Point2D *P, int n, int m){
 		//x: m = 0 , y: m=1
 		Point2D temp;
 		for (int i = n; i > 0; i--)

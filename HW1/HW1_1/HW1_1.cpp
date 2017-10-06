@@ -6,7 +6,7 @@
 #define TES_SIZE 20
 
 using namespace std;
-void sortP(Point2D *P, int n, int m);
+
 int main()
 {
 	
@@ -45,7 +45,14 @@ int main()
 	}	
 	
 	KDTree trainTree;
+	Node *R = trainTree.Root;
+	int mid = (int)(TR_SIZE / 2);
+	R->P = trainP[mid];
+	R->layer = 0;
+	R->up = nullptr;
 	
+	trainTree.MakeTree(R, trainP, trainP + mid, 0);
+	trainTree.MakeTree(R, trainP + mid + 1, trainP + TR_SIZE + 1, 1);
 
 
 
