@@ -54,6 +54,7 @@ int main()
 	trainTree.MakeTree(R, trainP, trainP + mid, 0);
 	trainTree.MakeTree(R, trainP + mid + 1, trainP + TR_SIZE + 1, 1);
 
+		
 
 
 	outFile.close();
