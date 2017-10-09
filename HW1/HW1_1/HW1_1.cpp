@@ -1,3 +1,7 @@
+/*******************************************************
+NCKU Department of Mechanical engineering OOP Homework 1
+
+********************************************************/
 #include <iostream>
 #include <fstream>
 #include "K_DTree.h"
@@ -44,18 +48,16 @@ int main()
 		cout << "Done load test data" << endl;
 	}	
 	
-	KDTree trainTree;
-	Node *R = trainTree.Root;
-	int mid = (int)(TR_SIZE / 2);
-	R->P = trainP[mid];
-	R->layer = 0;
-	R->up = nullptr;
+	//init K-D tree
+	KDTree trainTree(trainP,TR_SIZE);	
+
+	trainTree.Root->P.show();
+
+	cout << "\n" <<trainTree.Root->up << " " << trainTree.Root->layer << endl;
+
+	Point2D P = trainTree.FindNear(testP[0]);
 	
-	trainTree.MakeTree(R, trainP, trainP + mid, 0);
-	trainTree.MakeTree(R, trainP + mid + 1, trainP + TR_SIZE + 1, 1);
-
-		
-
+	P.show();
 
 	outFile.close();
 	trainFile.close();
