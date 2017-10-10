@@ -1,6 +1,7 @@
 /*******************************************************
 NCKU Department of Mechanical engineering OOP Homework 1
-
+Write by david1104
+github: https://github.com/david11014
 ********************************************************/
 #include <iostream>
 #include <fstream>
@@ -18,10 +19,11 @@ int main()
 	
 
 	/*Read train file and test file*/
-	ifstream outFile,trainFile,testFile;
-	outFile.open("test-result-1.txt", std::ifstream::out);
-	trainFile.open("train-data.txt", std::ifstream::in);
-	testFile.open("test-data.txt", std::ifstream::in);
+	ifstream trainFile,testFile;
+	ofstream outFile;
+	outFile.open("test-result-1.txt");
+	trainFile.open("train-data.txt");
+	testFile.open("test-data.txt");
 	
 	if (trainFile.is_open())
 	{
@@ -51,16 +53,23 @@ int main()
 	//init K-D tree
 	KDTree trainTree(trainP,TR_SIZE);	
 
+	cout << "train done" << endl;
 	
-	//trainTree.show();
-	//Point2D P = trainTree.FindNear(testP[0]);
+	cout << "find label" << endl;
+	for (int i = 0; i < TES_SIZE; i++)
+	{
+		Point2D P = trainTree.FindNear(testP[i]);
+		P.x = testP[i].x;
+		P.y = testP[i].y;
+		cout << P << endl;
+		outFile << P << endl;
+	}
 	
-	//P.show();
-
+	cout << "all done." << endl;
 	outFile.close();
 	trainFile.close();
 	testFile.close();
-
+	
 	getchar();
 	return 0;
 }

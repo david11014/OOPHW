@@ -1,9 +1,10 @@
 /*******************************************************
 NCKU Department of Mechanical engineering OOP Homework 1
 Write by david1104
+github: https://github.com/david11014
 ********************************************************/
-#include<math.h>
-#include<iostream>
+#include <math.h>
+#include <iostream>
 #include <memory>  
 using namespace std;
 #ifndef K_DTREE
@@ -68,7 +69,16 @@ public:
 	void show() {
 		std::cout << p[0] << " " << p[1] << " " << l;
 	}
+
+	friend ostream& operator<<(ostream&, const Point2D&);
+	
 };
+
+ostream& operator<<(ostream& os, const Point2D& p)
+{
+	os << p.x << ", " << p.y << " " << p.l;
+	return os;
+}
 
 class Node {
 
@@ -94,7 +104,7 @@ public:
 
 	void show()
 	{
-		cout << " address:" << this << " layer:" << layer << " up:" << up << " child1:" << child << " child2:" << child + 1 << endl;
+		cout << " address:" << this << " layer:" << layer << " up:" << up << " child1:" << child[0] << " child2:" << child[1] << endl;
 	}
 };
 
@@ -102,8 +112,7 @@ class KDTree {
 
 public:
 	Node* Root;
-
-
+	
 	KDTree(Point2D trainP[],int trSize)
 	{
 		int mid = (int)(trSize / 2);
@@ -113,9 +122,10 @@ public:
 		Root->up = nullptr;
 		
 		MakeTree(Root, trainP, trainP + mid, 0);
-		MakeTree(Root, trainP + mid + 1, trainP + trSize + 1, 0);
-
+		MakeTree(Root, trainP + mid + 1, trainP + trSize + 1, 1);
+#ifdef DEBUG
 		Root->show();
+#endif 
 
 		stack = new Node*[trSize];
 	}
@@ -128,133 +138,19 @@ public:
 		N->layer = pa->layer + 1;
 		pa->child[i] = N;
 
-		N->show();
+		//N->show();
 		
 
 		return N;
 	}
 
-	void MakeTree(Node*parrent, Point2D * start, Point2D *end,int i)
-	{
-		int n = (end - start);
-		
-		if (n == 1)
-		{
-			Add(parrent, start, i);
-			return;
-		}
-		else if (n < 1)
-		{
-			return;
-		}
-		else
-		{				
-			int mid = (int)(n / 2);
-			
-			SortP(start, n, i);
-			Node*N = Add(parrent, start + mid, i);//add divide point in node
-			i = (i == 0 ? 1 : 0); //change sort x or y in next node
-			MakeTree(N, start, start + mid, i);
-			MakeTree(N, start + mid + 1, end, i);
-		}
-		
-		return;
-	}
-
 	Point2D FindNear(Point2D P)
 	{
+		end = -1;
+		ResetVisit(this->Root);
 		return FindNear(&P, this->Root);
 	}
-	//Point2D FindNear(Point2D *P, Node* N)
-	//{
-	//	//leaf
-	//	if (N->child[0] == nullptr&&N->child[1] == nullptr)
-	//	{			
-	//		return N->P;
-	//	}
-	//	else //node
-	//	{
-	//		int d = (N->layer) % 2; //0:x , 1:y
-	//		Point2D nearP;
-	//		if (P->p[d] > N->P[d])
-	//		{
-	//			nearP = FindNear(P, N->child[1]);
-	//			double nd = P->Distant(nearP);
-	//			if (nd > abs(P->p[d] - N->P[d]))
-	//			{
-	//				Point2D nearPTemp = FindNear(P, N->child[0]);
-	//				if (P->Distant(nearP) > P->Distant(nearPTemp))
-	//					nearP = nearPTemp;
-	//			}
-	//		}				
-	//		else
-	//		{
-	//			nearP = FindNear(P, N->child[0]);
-	//			double nd = P->Distant(nearP);
-	//			if (nd > abs(P->p[d] - N->P[d]))
-	//			{
-	//				Point2D nearPTemp = FindNear(P, N->child[1]);
-	//				if (P->Distant(nearP) > P->Distant(nearPTemp))
-	//					nearP = nearPTemp;
-	//			}
-	//		}
-	//		return nearP;
-	//	}
-	//}
-
-	Point2D FindNear(Point2D *P, Node* N)
-	{
-		Point2D nearP = N->P;
-		Push(N);
-		do {
-			
-			//判斷是否可往下走，
-			if ((stack[end]->child[0] == nullptr || stack[end]->child[0]->visited == 1) && (stack[end]->child[0] == nullptr || stack[end]->child[1]->visited == 1))
-			{
-				//更新最近點
-				if (stack[end]->P.Distant(nearP) < P->Distant(nearP))
-				{
-					nearP = stack[end]->P;
-				}
-				Pop();
-			}
-			else if (stack[end]->child[0]->visited == 1 && stack[end]->child[1]->visited == 0)
-			{
-				double D = P->Distant(stack[end]->child[1]->P);
-				
-				if (P->Distant(nearP) > D)
-				{
-					Push(stack[end]->child[1]);
-				}					
-			}
-			else if (stack[end]->child[0]->visited == 0 && stack[end]->child[1]->visited == 1)
-			{
-				double D = P->Distant(stack[end]->child[0]->P);
-
-				if (P->Distant(nearP) > D)
-				{
-					Push(stack[end]->child[0]);
-				}					
-			}
-			else
-			{
-				int d = (stack[end]->layer) % 2;
-				if (P->p[d] < stack[end]->P[d])
-				{
-					if(stack[end]->child[0]->visited == 0)
-						Push(stack[end]->child[0]);
-				}
-				else
-				{
-					if (stack[end]->child[1]->visited == 0)
-						Push(stack[end]->child[1]);
-				}
-			}
-			
-		} while (end == -1);
-		return nearP;
-	}
-
+	
 	void show()
 	{
 		show(Root);
@@ -273,9 +169,99 @@ public:
 
 		return;
 	}
+
 private:
 	Node* *stack;
 	int end = -1;
+
+	void MakeTree(Node*parrent, Point2D * start, Point2D *end, int i)
+	{
+		int n = (end - start);
+
+		if (n == 1)
+		{
+			Add(parrent, start, i);
+			return;
+		}
+		else if (n < 1)
+		{
+			return;
+		}
+		else
+		{
+			int mid = (int)(n / 2);
+
+			SortP(start, n, i);
+			Node*N = Add(parrent, start + mid, i);//add divide point in node
+			i = (i == 0 ? 1 : 0); //change sort x or y in next node
+			MakeTree(N, start, start + mid, 0);
+			MakeTree(N, start + mid + 1, end, 1);
+		}
+
+		return;
+	}
+
+	Point2D FindNear(Point2D *P, Node* N)
+	{
+		Point2D nearP = N->P;
+		Push(N);
+		do {
+
+			//判斷是否可往下走，
+			if (CanVisit(stack[end]->child[0]) == false && CanVisit(stack[end]->child[1]) == false)
+			{
+				//更新最近點
+				if (stack[end]->P.Distant(nearP) < P->Distant(nearP))
+				{
+					nearP = stack[end]->P;
+				}
+				Pop();
+			}
+			else if (CanVisit(stack[end]->child[0]) == false && CanVisit(stack[end]->child[1]) == true)
+			{
+				double D = P->Distant(stack[end]->child[1]->P);
+
+				if (P->Distant(nearP) > D)
+				{
+					Push(stack[end]->child[1]);
+				}
+				else
+				{
+					Pop();
+				}
+			}
+			else if (CanVisit(stack[end]->child[0]) == true && CanVisit(stack[end]->child[1]) == false)
+			{
+				double D = P->Distant(stack[end]->child[0]->P);
+
+				if (P->Distant(nearP) > D)
+				{
+					Push(stack[end]->child[0]);
+				}
+				else
+				{
+					Pop();
+				}
+			}
+			else
+			{
+				int d = (stack[end]->layer) % 2;
+				if (P->p[d] < stack[end]->P[d])
+				{
+					if (stack[end]->child[0]->visited == 0)
+						Push(stack[end]->child[0]);
+				}
+				else
+				{
+					if (stack[end]->child[1]->visited == 0)
+						Push(stack[end]->child[1]);
+				}
+			}
+
+		} while (end != -1);
+		return nearP;
+	}
+
 	void SortP(Point2D *P, int n, int m){
 		//x: m = 0 , y: m=1
 		Point2D temp;
@@ -295,25 +281,47 @@ private:
 
 	void Push(Node* N)
 	{
-		std::cout << "push:";
-		N->P.show();
-		std::cout << " " << N->layer << " " << N->visited << std::endl;
-
+#ifdef DEBUG
+		std::cout << "push:" << end << " ";
+		N->show();
+#endif 
+		
 		end++;
 		stack[end] = N;
 	}
 	Node* Pop()
 	{
-		std::cout << "pop:";
-		stack[end]->P.show();
-		std::cout << " " << stack[end]->layer << " " << stack[end]->visited << std::endl;
-
+#ifdef DEBUG
+		std::cout << "pop:" << end << " ";
+		stack[end]->show();
+#endif
+		
 		stack[end]->visited = 1;
 		end--;
 		return stack[end + 1];
 	}
 
+	bool CanVisit(Node* N)
+	{
+		if (N == nullptr)
+			return false;
+		else if (N->visited == 1)
+			return false;
+		else
+			return true;
+	}
+
+	void ResetVisit(Node* N)
+	{
+		N->visited = 0;
+		if (N->child[0] != nullptr)
+			ResetVisit(N->child[0]);
+
+		if (N->child[1] != nullptr)
+			ResetVisit(N->child[1]);
+
+		return;		
+	}
 };
 
 #endif // !K_DTREE
-
