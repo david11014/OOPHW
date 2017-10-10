@@ -51,10 +51,7 @@ int main()
 	//init K-D tree
 	KDTree trainTree(trainP,TR_SIZE);	
 
-	trainTree.Root->show();
-
-	cout << "\n" <<trainTree.Root->up << " " << trainTree.Root->layer << endl;
-
+	
 	//trainTree.show();
 	//Point2D P = trainTree.FindNear(testP[0]);
 	

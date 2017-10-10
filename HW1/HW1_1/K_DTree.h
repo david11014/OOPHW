@@ -4,6 +4,7 @@ Write by david1104
 ********************************************************/
 #include<math.h>
 #include<iostream>
+#include <memory>  
 using namespace std;
 #ifndef K_DTREE
 #define K_DTREE
@@ -93,14 +94,14 @@ public:
 
 	void show()
 	{
-		cout <<"address:"<< this << " layer:" << layer << " up:" << up << " child1:" << child << " child2:" << child + 2;
+		cout << " address:" << this << " layer:" << layer << " up:" << up << " child1:" << child << " child2:" << child + 1 << endl;
 	}
 };
 
 class KDTree {
 
 public:
-	Node *Root;
+	Node* Root;
 
 
 	KDTree(Point2D trainP[],int trSize)
@@ -110,24 +111,30 @@ public:
 		Root->P = trainP[mid];
 		Root->layer = 0;
 		Root->up = nullptr;
+		
+		MakeTree(Root, trainP, trainP + mid, 0);
+		MakeTree(Root, trainP + mid + 1, trainP + trSize + 1, 0);
 
-		MakeTree(Root, trainP, trainP + trSize + 1, 0);
+		Root->show();
 
 		stack = new Node*[trSize];
 	}
 
 	Node* Add(Node* pa, Point2D *P,int i)
 	{
-		Node *N = new Node;
+		Node* N(new Node);
 		N->up = pa;
 		N->P = *P;
 		N->layer = pa->layer + 1;
 		pa->child[i] = N;
 
+		N->show();
+		
+
 		return N;
 	}
 
-	void MakeTree(Node *parrent, Point2D * start, Point2D *end,int i)
+	void MakeTree(Node*parrent, Point2D * start, Point2D *end,int i)
 	{
 		int n = (end - start);
 		
@@ -143,12 +150,12 @@ public:
 		else
 		{				
 			int mid = (int)(n / 2);
+			
 			SortP(start, n, i);
-			Node *N = Add(parrent, start + mid, i);//add divide point in node
+			Node*N = Add(parrent, start + mid, i);//add divide point in node
 			i = (i == 0 ? 1 : 0); //change sort x or y in next node
 			MakeTree(N, start, start + mid, i);
 			MakeTree(N, start + mid + 1, end, i);
-
 		}
 		
 		return;
@@ -258,10 +265,10 @@ public:
 		N->show();
 		cout << endl;
 
-		//if (N->child[0] != nullptr)
+		if (N->child[0] != nullptr)
 			show(N->child[0]);
 
-		//if (N->child[1] != nullptr)
+		if (N->child[1] != nullptr)
 			show(N->child[1]);
 
 		return;
