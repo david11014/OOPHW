@@ -7,8 +7,9 @@ github: https://github.com/david11014
 #include <iostream>
 #include <memory>  
 using namespace std;
-#ifndef K_DTREE
-#define K_DTREE
+#define DEBUG
+#ifndef K_DTREE_H
+#define K_DTREE_H
 
 class Point2D {
 
@@ -23,6 +24,13 @@ public:
 		};
 	};
 	int l;
+	Point2D() {};
+	Point2D(double a, double b, int c)
+	{
+		x = a;
+		y = b;
+		l = c;
+	}
 
 	double& operator[](unsigned int i)
 	{
@@ -76,7 +84,7 @@ public:
 
 ostream& operator<<(ostream& os, const Point2D& p)
 {
-	os << p.x << ", " << p.y << " " << p.l;
+	os << p.x << "\t" << p.y << "\t" << p.l;
 	return os;
 }
 
@@ -87,6 +95,7 @@ public:
 	Node* child[2];
 	Point2D P;
 	int layer;
+	double axis;
 	int visited;
 	Node() 
 	{
@@ -104,7 +113,16 @@ public:
 
 	void show()
 	{
-		cout << " address:" << this << " layer:" << layer << " up:" << up << " child1:" << child[0] << " child2:" << child[1] << endl;
+		cout << P << "\taxis:"<< axis << " address:" << this << " layer:" << layer << " up:" << up << " child1:" << child[0] << " child2:" << child[1] << endl;
+		
+	}
+
+	bool isLeaf()
+	{
+		if (child[0] == nullptr && child[1] == nullptr)
+			return true;
+		else 
+			return false;
 	}
 };
 
@@ -115,19 +133,23 @@ public:
 	
 	KDTree(Point2D trainP[],int trSize)
 	{
+		SortP(trainP, trSize, 0);
+
 		int mid = (int)(trSize / 2);
-		Root = new Node;
-		Root->P = trainP[mid];
+
+		Root = new Node;		
 		Root->layer = 0;
-		Root->up = nullptr;
+		Root->axis = trainP[mid].p[0];
+		Root->up = nullptr;		
 		
+
 		MakeTree(Root, trainP, trainP + mid, 0);
-		MakeTree(Root, trainP + mid + 1, trainP + trSize + 1, 1);
+		MakeTree(Root, trainP + mid, trainP + trSize + 1, 1);
 #ifdef DEBUG
 		Root->show();
 #endif 
 
-		stack = new Node*[trSize];
+		stack = new Node*[trSize * 2];
 	}
 
 	Node* Add(Node* pa, Point2D *P,int i)
@@ -148,7 +170,11 @@ public:
 	{
 		end = -1;
 		ResetVisit(this->Root);
-		return FindNear(&P, this->Root);
+		
+		double nearD = DBL_MAX;
+		Point2D *nearP = new Point2D;
+		FindNear(&P, this->Root, nearP, &nearD);
+		return *nearP;
 	}
 	
 	void show()
@@ -192,70 +218,100 @@ private:
 			int mid = (int)(n / 2);
 
 			SortP(start, n, i);
-			Node*N = Add(parrent, start + mid, i);//add divide point in node
+			Node*N = new Node;
+			N->up = parrent;			
+			N->layer = parrent->layer + 1;
+			int d = (N->layer) % 2;
+			N->axis = start[mid].p[d];
+			parrent->child[i] = N;
+
 			i = (i == 0 ? 1 : 0); //change sort x or y in next node
 			MakeTree(N, start, start + mid, 0);
-			MakeTree(N, start + mid + 1, end, 1);
+			MakeTree(N, start + mid, end, 1);
 		}
 
 		return;
 	}
 
-	Point2D FindNear(Point2D *P, Node* N)
+	void FindNear(Point2D *P, Node* N, Point2D *nearP, double *nearD)
 	{
-		Point2D nearP = N->P;
-		Push(N);
-		do {
-
-			//判斷是否可往下走，
-			if (CanVisit(stack[end]->child[0]) == false && CanVisit(stack[end]->child[1]) == false)
+		if (N->isLeaf())
+		{
+			if (P->Distant(N->P) < *nearD)
 			{
-				//更新最近點
-				if (stack[end]->P.Distant(nearP) < P->Distant(nearP))
-				{
-					nearP = stack[end]->P;
-				}
-				Pop();
+				*nearD = P->Distant(N->P);
+				*nearP = N->P;
 			}
-			else if (CanVisit(stack[end]->child[0]) == false && CanVisit(stack[end]->child[1]) == true)
-			{
-				double D = P->Distant(stack[end]->child[1]->P);
+		}
+		else
+		{		
+			int d = (N->layer) % 2;
 
-				if (P->Distant(nearP) > D)
-				{
-					Push(stack[end]->child[1]);
-				}
-				else
-				{
-					Pop();
-				}
-			}
-			else if (CanVisit(stack[end]->child[0]) == true && CanVisit(stack[end]->child[1]) == false)
+			if (P->p[d] < N->P[d]) //軸在左邊
 			{
-				double D = P->Distant(stack[end]->child[0]->P);
 
-				if (P->Distant(nearP) > D)
-				{
-					Push(stack[end]->child[0]);
-				}
-				else
-				{
-					Pop();
-				}
+				if (P->p[d] - *nearD < N->axis && CanVisit(N->child[0])) 
+					FindNear(P, N->child[0], nearP, nearD);
+
+				if (P->p[d] + *nearD >= N->axis && CanVisit(N->child[1]))
+					FindNear(P, N->child[1], nearP, nearD);
+
 			}
 			else
 			{
+				if (P->p[d] + *nearD >= N->axis && CanVisit(N->child[1]))
+					FindNear(P, N->child[1], nearP, nearD);
+
+				if (P->p[d] - *nearD < N->axis && CanVisit(N->child[0]))
+					FindNear(P, N->child[0], nearP, nearD);
+			}
+		
+		}
+		
+	}
+
+	Point2D FindNear(Point2D *P, Node* N)
+	{
+		Point2D nearP = N->P;
+		double nearD = DBL_MAX;
+		Push(N);
+		do {
+
+			//判斷是否可往下走
+			if (stack[end]->isLeaf())
+			{
+				//更新最近點
+				if (stack[end]->P.Distant(nearP) < nearD)
+				{
+					nearD = stack[end]->P.Distant(nearP);
+					nearP = stack[end]->P;
+				}
+				Pop();
+			}			
+			else {
 				int d = (stack[end]->layer) % 2;
-				if (P->p[d] < stack[end]->P[d])
+				if (stack[end]->axis > P->p[d]) //點在軸左邊
 				{
-					if (stack[end]->child[0]->visited == 0)
+					if (P->p[d] - nearD <= stack[end]->axis && CanVisit(stack[end]->child[0]))
 						Push(stack[end]->child[0]);
-				}
-				else
-				{
-					if (stack[end]->child[1]->visited == 0)
+
+					if (P->p[d] + nearD > stack[end]->axis && CanVisit(stack[end]->child[1]))
 						Push(stack[end]->child[1]);
+					else
+						Pop();
+
+
 				}
+				else //點在軸右邊
+				{
+					if (P->p[d] + nearD > stack[end]->axis && CanVisit(stack[end]->child[1]))
+						Push(stack[end]->child[0]);
+
+					if (P->p[d] - nearD <= stack[end]->axis && CanVisit(stack[end]->child[0]))
+						Push(stack[end]->child[1]);
+					else
+						Pop();
+				}				
 			}
 
 		} while (end != -1);
@@ -282,7 +338,7 @@ private:
 	void Push(Node* N)
 	{
 #ifdef DEBUG
-		std::cout << "push:" << end << " ";
+		std::cout << "push:" << end+1 << " ";
 		N->show();
 #endif 
 		
@@ -292,7 +348,7 @@ private:
 	Node* Pop()
 	{
 #ifdef DEBUG
-		std::cout << "pop:" << end << " ";
+		std::cout << "pop:" << end+1 << " ";
 		stack[end]->show();
 #endif
 		
@@ -322,6 +378,9 @@ private:
 
 		return;		
 	}
+
+	
+
 };
 
 #endif // !K_DTREE

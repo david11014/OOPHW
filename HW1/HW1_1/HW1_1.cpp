@@ -12,6 +12,22 @@ github: https://github.com/david11014
 
 using namespace std;
 
+Point2D Find(Point2D P, Point2D *trainP, int n)
+{
+	double D = DBL_MAX;
+	int I;
+	for (int i = 0; i < n; i++)
+	{
+		if (P.Distant(trainP[i]) < D)
+		{
+			D = P.Distant(trainP[i]);
+			I = i;
+		}
+			
+	}
+	return trainP[I];
+}
+
 int main()
 {
 	
@@ -58,13 +74,35 @@ int main()
 	cout << "find label" << endl;
 	for (int i = 0; i < TES_SIZE; i++)
 	{
+		cout << "find:" << testP[i] << endl;
 		Point2D P = trainTree.FindNear(testP[i]);
-		P.x = testP[i].x;
-		P.y = testP[i].y;
-		cout << P << endl;
-		outFile << P << endl;
+		Point2D TP = Find(testP[i], trainP, TR_SIZE);	
+
+		//P.x = testP[i].x;
+		//P.y = testP[i].y;
+		double D = P.Distant(testP[i]);
+		if (P.l != testP[i].l)
+		{
+			cout << testP[i].l << endl;
+			P.l = 0;
+		}
+			
+
+		cout << P << " " << D << endl;		
+		cout << TP << " " << TP.Distant(testP[i]) << endl;
+
+		outFile << P << " " << D << endl;
+		outFile << TP << " " << TP.Distant(testP[i]) << endl;
 	}
-	
+	//
+	//Point2D t(35.38895558336125, -24.516727931346917, 1);
+
+	//Point2D P = trainTree.FindNear(t);
+	//Point2D TP = Find(t, trainP, TR_SIZE);
+	//double D = P.Distant(t);
+	//cout << P << " " << D << endl;
+	//cout << TP << " " << TP.Distant(t) << endl;
+
 	cout << "all done." << endl;
 	outFile.close();
 	trainFile.close();

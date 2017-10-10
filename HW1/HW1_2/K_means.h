@@ -7,9 +7,9 @@ github: https://github.com/david11014
 #include <iostream>
 #include <memory>  
 using namespace std;
-#define DEBUG
-#ifndef K_MEANS
-#define K_MEANS
+
+#ifndef K_MEANS_H
+#define K_MEANS_H
 
 class Point2D {
 
@@ -26,7 +26,7 @@ public:
 	int l;
 
 	Point2D() {};
-	Point2D(double a, double b, double c)
+	Point2D(double a, double b, int c)
 	{
 		x = a;
 		y = b;
