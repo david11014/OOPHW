@@ -141,7 +141,6 @@ public:
 
 	}
 	
-	
 
 	Point2D FindLabel(Point2D P)
 	{

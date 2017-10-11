@@ -97,6 +97,7 @@ public:
 	int layer;
 	double axis;
 	int visited;
+
 	Node() 
 	{
 		child[0] = nullptr;
@@ -113,9 +114,10 @@ public:
 
 	void show()
 	{
-		cout << P << "\taxis:"<< axis << " address:" << this << " layer:" << layer << " up:" << up << " child1:" << child[0] << " child2:" << child[1] << endl;
-		
+		cout << P << "\taxis:"<< axis << " address:" << this << " layer:" << layer << " up:" << up << " child1:" << child[0] << " child2:" << child[1] << endl;		
 	}
+
+	friend ostream& operator<<(ostream&, const Node&);
 
 	bool isLeaf()
 	{
@@ -126,30 +128,42 @@ public:
 	}
 };
 
+ostream& operator<<(ostream& os, const Node& N)
+{
+	os << N.P << "\taxis:" << N.axis << " address:" << &N << " layer:" << N.layer << " up:" << N.up << " child1:" << N.child[0] << " child2:" << N.child[1] << endl;
+	return os;
+}
+
 class KDTree {
 
 public:
-	Node* Root;
-	
-	KDTree(Point2D trainP[],int trSize)
+	Node* Root;	
+	Point2D *trainP;
+
+	KDTree(Point2D trainData[],int trSize)
 	{
+		trainP = new Point2D[trSize];
+
+		memcpy(trainP, trainData, trSize * (sizeof(Point2D)));
+
 		SortP(trainP, trSize, 0);
 
 		int mid = (int)(trSize / 2);
 
 		Root = new Node;		
 		Root->layer = 0;
-		Root->axis = trainP[mid].p[0];
-		Root->up = nullptr;		
+		Root->axis = (trainP[mid].p[0] + trainP[mid + 1].p[0]) / 2;
+		Root->up = nullptr;
 		
 
 		MakeTree(Root, trainP, trainP + mid, 0);
-		MakeTree(Root, trainP + mid, trainP + trSize + 1, 1);
+		MakeTree(Root, trainP + mid, trainP + trSize, 1);
 #ifdef DEBUG
 		Root->show();
 #endif 
 
 		stack = new Node*[trSize * 2];
+		
 	}
 
 	Node* Add(Node* pa, Point2D *P,int i)
@@ -159,10 +173,7 @@ public:
 		N->P = *P;
 		N->layer = pa->layer + 1;
 		pa->child[i] = N;
-
-		//N->show();
 		
-
 		return N;
 	}
 
@@ -173,7 +184,10 @@ public:
 		
 		double nearD = DBL_MAX;
 		Point2D *nearP = new Point2D;
-		FindNear(&P, this->Root, nearP, &nearD);
+		//FindNear(&P, this->Root, nearP, &nearD);		
+		//FindNear(&P, this->Root);
+		Find(&P, this->Root, nearP, &nearD);
+		
 		return *nearP;
 	}
 	
@@ -200,34 +214,37 @@ private:
 	Node* *stack;
 	int end = -1;
 
-	void MakeTree(Node*parrent, Point2D * start, Point2D *end, int i)
+	void MakeTree(Node*parrent, Point2D * start, Point2D *end, int i) //來自child[i]
 	{
 		int n = (end - start);
+		Node* N(new Node);
+		N->up = parrent;
+		N->layer = parrent->layer + 1;
+		parrent->child[i] = N;
 
 		if (n == 1)
-		{
-			Add(parrent, start, i);
-			return;
-		}
-		else if (n < 1)
-		{
-			return;
+		{				
+			N->P = *start;	
 		}
 		else
-		{
-			int mid = (int)(n / 2);
-
-			SortP(start, n, i);
-			Node*N = new Node;
-			N->up = parrent;			
-			N->layer = parrent->layer + 1;
+		{	
 			int d = (N->layer) % 2;
-			N->axis = start[mid].p[d];
-			parrent->child[i] = N;
+			SortP(start, n, d);
 
-			i = (i == 0 ? 1 : 0); //change sort x or y in next node
-			MakeTree(N, start, start + mid, 0);
+			int mid = (int)(n / 2);
+			//求中位數
+			if (n % 2 == 0)
+			{
+				N->axis = (start[mid].p[d] + start[mid - 1].p[d]) / 2;
+			}
+			else
+			{
+				N->axis = start[mid].p[d];
+			}
+			
+			MakeTree(N, start, start + mid, 0);			
 			MakeTree(N, start + mid, end, 1);
+				
 		}
 
 		return;
@@ -270,9 +287,43 @@ private:
 		
 	}
 
+	void Find(Point2D *P, Node* N, Point2D *nearP, double *nearD)
+	{	
+		 
+		if (N->isLeaf())
+		{
+			//更新最近點
+			if (P->Distant(N->P) < *nearD)
+			{
+				*nearD = P->Distant(N->P);
+				*nearP = N->P;
+			}
+			//cout << "<" << *N << *nearD << ">" << endl;
+		}
+		else
+		{			
+			//cout << "down " << *N << endl;
+			if ((N->child[0]) != nullptr)
+			{
+				//cout << ">" << N->child[0] << endl;
+				Find(P, N->child[0], nearP, nearD);
+			}				
+
+			if ((N->child[1]) != nullptr)
+			{
+				//cout << ">" << N->child[1] << endl;
+				Find(P, N->child[1], nearP, nearD);				
+			}
+			//cout << "up " << *N << endl;
+				
+		}
+				
+		return;
+	}
+
 	Point2D FindNear(Point2D *P, Node* N)
 	{
-		Point2D nearP = N->P;
+		Point2D nearP;
 		double nearD = DBL_MAX;
 		Push(N);
 		do {
@@ -281,49 +332,64 @@ private:
 			if (stack[end]->isLeaf())
 			{
 				//更新最近點
-				if (stack[end]->P.Distant(nearP) < nearD)
+				if (P->Distant(stack[end]->P) < nearD)
 				{
-					nearD = stack[end]->P.Distant(nearP);
+					nearD = P->Distant(stack[end]->P);
 					nearP = stack[end]->P;
 				}
 				Pop();
 			}			
 			else {
-				int d = (stack[end]->layer) % 2;
-				if (stack[end]->axis > P->p[d]) //點在軸左邊
-				{
-					if (P->p[d] - nearD <= stack[end]->axis && CanVisit(stack[end]->child[0]))
-						Push(stack[end]->child[0]);
+				int d = (stack[end]->layer) % 2; //判斷 X Y 軸
 
-					if (P->p[d] + nearD > stack[end]->axis && CanVisit(stack[end]->child[1]))
-						Push(stack[end]->child[1]);
-					else
-						Pop();
+				//if (stack[end]->axis > P->p[d]) //點在軸左邊
+				//{
+				//	if (CanVisit(stack[end]->child[0]) == true)
+				//	{
+				//		Push(stack[end]->child[0]);
+				//	}
+				//	else if (CanVisit(stack[end]->child[1]) == true && stack[end]->axis - P->p[d] <= nearD)
+				//	{
+				//		Push(stack[end]->child[1]);
+				//	}
+				//	else
+				//		Pop();
+				//		
+				//}
+				//else //點在軸右邊
+				//{
+				//	if (CanVisit(stack[end]->child[1]) == true)
+				//	{
+				//		Push(stack[end]->child[1]);
+				//	}
+				//	else if (CanVisit(stack[end]->child[0]) == true && P->p[d] - stack[end]->axis <= nearD)
+				//	{
+				//		Push(stack[end]->child[0]);
+				//	}
+				//	else
+				//		Pop();
+				//}			
+
+				if (CanVisit(stack[end]->child[0]) == true)
+					Push(stack[end]->child[0]);
+				else if (CanVisit(stack[end]->child[1]) == true)
+					Push(stack[end]->child[1]);
+				else
+					Pop();
 
 
-				}
-				else //點在軸右邊
-				{
-					if (P->p[d] + nearD > stack[end]->axis && CanVisit(stack[end]->child[1]))
-						Push(stack[end]->child[0]);
-
-					if (P->p[d] - nearD <= stack[end]->axis && CanVisit(stack[end]->child[0]))
-						Push(stack[end]->child[1]);
-					else
-						Pop();
-				}				
 			}
 
 		} while (end != -1);
 		return nearP;
 	}
 
-	void SortP(Point2D *P, int n, int m){
+	void SortP(Point2D* P, int n, int m){
 		//x: m = 0 , y: m=1
 		Point2D temp;
-		for (int i = n; i > 0; i--)
+		for (int i = 0; i < n - 1; i++)
 		{
-			for (int j = 0; j < i; j++)
+			for (int j = 0; j < n - i - 1; j++)
 			{
 				if ((P[j])[m] > (P[j + 1])[m])
 				{

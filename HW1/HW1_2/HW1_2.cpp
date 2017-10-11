@@ -67,8 +67,7 @@ int main()
 		cout << P << " " << P.l*testP[i].l << endl;
 #else
 		cout << P << endl;
-#endif 	
-		
+#endif 			
 		outFile << P << endl;
 	}
 

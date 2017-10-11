@@ -6,7 +6,7 @@ github: https://github.com/david11014
 #include <iostream>
 #include <fstream>
 #include "K_DTree.h"
-
+#define DEBUG
 #define TR_SIZE 100
 #define TES_SIZE 20
 
@@ -73,40 +73,36 @@ int main()
 	
 	cout << "find label" << endl;
 	for (int i = 0; i < TES_SIZE; i++)
-	{
-		cout << "find:" << testP[i] << endl;
+	{	
+		Point2D TP = Find(testP[i], trainP, TR_SIZE);
 		Point2D P = trainTree.FindNear(testP[i]);
-		Point2D TP = Find(testP[i], trainP, TR_SIZE);	
 
-		//P.x = testP[i].x;
-		//P.y = testP[i].y;
-		double D = P.Distant(testP[i]);
-		if (P.l != testP[i].l)
-		{
-			cout << testP[i].l << endl;
-			P.l = 0;
-		}
-			
+#ifdef DEBUG
+		//cout << P << " " << P.l * testP[i].l << endl;		
+		//cout << TP   << " " << TP.l * testP[i].l << " " << TP.Distant(testP[i]) << endl;
 
-		cout << P << " " << D << endl;		
-		cout << TP << " " << TP.Distant(testP[i]) << endl;
-
-		outFile << P << " " << D << endl;
-		outFile << TP << " " << TP.Distant(testP[i]) << endl;
+		cout << P << " "<< P.l * testP[i].l << endl;
+		cout << TP << " " << TP.l * testP[i].l << endl;
+		outFile << P << " " << P.l * testP[i].l << endl;
+#else
+		cout << P << endl;
+		outFile << P << endl;
+#endif 			
+		
 	}
-	//
-	//Point2D t(35.38895558336125, -24.516727931346917, 1);
+	
+	//Point2D t(101.59737233216403, 35.7351346943152, -1);
 
 	//Point2D P = trainTree.FindNear(t);
 	//Point2D TP = Find(t, trainP, TR_SIZE);
-	//double D = P.Distant(t);
-	//cout << P << " " << D << endl;
+	//cout << t << endl;
+	//cout << P << " " << P.Distant(t) << endl;
 	//cout << TP << " " << TP.Distant(t) << endl;
 
-	cout << "all done." << endl;
-	outFile.close();
-	trainFile.close();
-	testFile.close();
+	//cout << "all done." << endl;
+	//outFile.close();
+	//trainFile.close();
+	//testFile.close();
 	
 	getchar();
 	return 0;
