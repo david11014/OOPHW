@@ -7,7 +7,7 @@ github: https://github.com/david11014
 #include <iostream>
 #include <ctime> 
 using namespace std;
-#define DEBUG
+//#define DEBUG
 #ifndef PLA_H
 #define PLA_H
 
@@ -79,6 +79,23 @@ public:
 		std::cout << p[0] << " " << p[1] << " " << l;
 	}
 
+	double Cross(Point2D P)
+	{
+		return this->x * P[1] - this->y * P[0];
+	}
+
+	double Dot(Point2D P)
+	{
+		return this->x * P[0] + this->y * P[1];
+	}
+
+	Point2D Unit()
+	{
+		double L = sqrt((this->x * this->x) + (this->y * this->y));
+		return Point2D(this->x / L, this->y / L, 0);
+
+	}
+
 	friend ostream& operator<<(ostream&, const Point2D&);
 
 };
@@ -88,7 +105,6 @@ ostream& operator<<(ostream& os, const Point2D& p)
 	os << p.x << ", " << p.y << " " << p.l;
 	return os;
 }
-
 
 class PLA
 {
@@ -112,50 +128,49 @@ public:
 		{
 			Mid = Mid + trainP[i];
 		}
-		Mid = Mid / trSize;
-		V = Point2D(1, 0, 0);
-		for (int i = 0; i < Count; i++)
+		Mid = Mid / trSize;	
+
+		V = Point2D(-1,0, 0); //init vector
+
+		for (int i = 0; i < Count;)
 		{
 			int r = rand() % trSize;
 			Point2D v = trainP[r] - Mid;
 
-			
+			double C = V.Cross(v);
+
+			//需要修正方向的狀況
+			if ((V.Dot(v) < 0 && trainP[r].l ==-1) || (V.Dot(v) > 0 && trainP[r].l == 1))
+			{
+				V = V + v * trainP[r].l;
+				i++;
+#ifdef  DEBUG
+				cout << "V: " << V.Unit() << endl;
+#endif
+			}
 
 		}
+		V = V.Unit();
+		cout << *this << endl;
 	}
-
-
 
 	Point2D FindLabel(Point2D P)
 	{
-		double d1, d2;
-		d1 = M[0].Distant(P);
-		d2 = M[1].Distant(P);
+		Point2D v = P - Mid;
+		double D = V.Dot(v);
+		if (D > 0)
+			return Point2D(P[0], P[1], 1);
+		else 
+			return Point2D(P[0], P[1], -1);
 
-		if (d1 < d2)
-		{
-			P.l = -1;
-			return P;
-		}
-		else
-		{
-			P.l = 1;
-			return P;
-		}
 	}
 
 	friend ostream& operator<<(ostream&, const  PLA&);
 };
 
-ostream& operator<<(ostream&os, const  PLA& KM)
+ostream& operator<<(ostream&os, const  PLA& pla)
 {
-	os << "Train Data out" << endl;
-	for (int i = 0; i < KM.trSize; i++)
-	{
-		os << KM.trainP[i] << endl;
-	}
-
-
+	os << "Mid:" << pla.Mid << " V: " << pla.V;
 	return os;
 }
 

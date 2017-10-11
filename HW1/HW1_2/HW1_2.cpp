@@ -7,6 +7,8 @@ github: https://github.com/david11014
 #include <fstream>
 #include "K_means.h"
 
+//#define DEBUG
+
 #define TR_SIZE 100
 #define TES_SIZE 20
 
@@ -32,8 +34,7 @@ int main()
 		{
 			trainFile >> trainP[i].x;
 			trainFile >> trainP[i].y;
-			trainFile >> trainP[i].l;
-			//cout << trainP[i].x << " " << trainP[i].y << " " << trainP[i].l << endl;
+			trainFile >> trainP[i].l;			
 		}
 		cout << "Done load train data" << endl;
 	}
@@ -44,21 +45,30 @@ int main()
 		{
 			testFile >> testP[i].x;
 			testFile >> testP[i].y;
-			testFile >> testP[i].l;
-			//cout << testP[i].x << " " << testP[i].y << " " << testP[i].l << endl;
+			testFile >> testP[i].l;			
 		}
 		cout << "Done load test data" << endl;
 	}
 	Point2D P1(140.57414041910056,18.0524769614646,0), P2(16.20521473399179,42.37661357896893,0);
 	KMeans KM(P1, P2, trainP, TR_SIZE);
-	//cout << KM << endl;
+
+#ifdef DEBUG
+	cout << KM << endl;
+#endif
+
 	cout << "train done" << endl;
 
 	cout << "find label" << endl;
 	for (int i = 0; i < TES_SIZE; i++)
 	{
 		Point2D P = KM.FindLabel(testP[i]);
+
+#ifdef DEBUG
+		cout << P << " " << P.l*testP[i].l << endl;
+#else
 		cout << P << endl;
+#endif 	
+		
 		outFile << P << endl;
 	}
 
