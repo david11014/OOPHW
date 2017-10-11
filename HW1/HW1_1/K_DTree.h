@@ -7,7 +7,7 @@ github: https://github.com/david11014
 #include <iostream>
 #include <memory>  
 using namespace std;
-#define DEBUG
+//#define DEBUG
 #ifndef K_DTREE_H
 #define K_DTREE_H
 
@@ -184,9 +184,7 @@ public:
 		
 		double nearD = DBL_MAX;
 		Point2D *nearP = new Point2D;
-		//FindNear(&P, this->Root, nearP, &nearD);		
-		//FindNear(&P, this->Root);
-		Find(&P, this->Root, nearP, &nearD);
+		FindNear(&P, this->Root, nearP, &nearD);	
 		
 		return *nearP;
 	}
@@ -285,103 +283,6 @@ private:
 		
 		}
 		
-	}
-
-	void Find(Point2D *P, Node* N, Point2D *nearP, double *nearD)
-	{	
-		 
-		if (N->isLeaf())
-		{
-			//更新最近點
-			if (P->Distant(N->P) < *nearD)
-			{
-				*nearD = P->Distant(N->P);
-				*nearP = N->P;
-			}
-			//cout << "<" << *N << *nearD << ">" << endl;
-		}
-		else
-		{			
-			//cout << "down " << *N << endl;
-			if ((N->child[0]) != nullptr)
-			{
-				//cout << ">" << N->child[0] << endl;
-				Find(P, N->child[0], nearP, nearD);
-			}				
-
-			if ((N->child[1]) != nullptr)
-			{
-				//cout << ">" << N->child[1] << endl;
-				Find(P, N->child[1], nearP, nearD);				
-			}
-			//cout << "up " << *N << endl;
-				
-		}
-				
-		return;
-	}
-
-	Point2D FindNear(Point2D *P, Node* N)
-	{
-		Point2D nearP;
-		double nearD = DBL_MAX;
-		Push(N);
-		do {
-
-			//判斷是否可往下走
-			if (stack[end]->isLeaf())
-			{
-				//更新最近點
-				if (P->Distant(stack[end]->P) < nearD)
-				{
-					nearD = P->Distant(stack[end]->P);
-					nearP = stack[end]->P;
-				}
-				Pop();
-			}			
-			else {
-				int d = (stack[end]->layer) % 2; //判斷 X Y 軸
-
-				//if (stack[end]->axis > P->p[d]) //點在軸左邊
-				//{
-				//	if (CanVisit(stack[end]->child[0]) == true)
-				//	{
-				//		Push(stack[end]->child[0]);
-				//	}
-				//	else if (CanVisit(stack[end]->child[1]) == true && stack[end]->axis - P->p[d] <= nearD)
-				//	{
-				//		Push(stack[end]->child[1]);
-				//	}
-				//	else
-				//		Pop();
-				//		
-				//}
-				//else //點在軸右邊
-				//{
-				//	if (CanVisit(stack[end]->child[1]) == true)
-				//	{
-				//		Push(stack[end]->child[1]);
-				//	}
-				//	else if (CanVisit(stack[end]->child[0]) == true && P->p[d] - stack[end]->axis <= nearD)
-				//	{
-				//		Push(stack[end]->child[0]);
-				//	}
-				//	else
-				//		Pop();
-				//}			
-
-				if (CanVisit(stack[end]->child[0]) == true)
-					Push(stack[end]->child[0]);
-				else if (CanVisit(stack[end]->child[1]) == true)
-					Push(stack[end]->child[1]);
-				else
-					Pop();
-
-
-			}
-
-		} while (end != -1);
-		return nearP;
 	}
 
 	void SortP(Point2D* P, int n, int m){

@@ -6,7 +6,7 @@ github: https://github.com/david11014
 #include <iostream>
 #include <fstream>
 #include "K_DTree.h"
-#define DEBUG
+//#define DEBUG
 #define TR_SIZE 100
 #define TES_SIZE 20
 
@@ -78,12 +78,9 @@ int main()
 		Point2D P = trainTree.FindNear(testP[i]);
 
 #ifdef DEBUG
-		//cout << P << " " << P.l * testP[i].l << endl;		
-		//cout << TP   << " " << TP.l * testP[i].l << " " << TP.Distant(testP[i]) << endl;
 
-		cout << P << " "<< P.l * testP[i].l << endl;
-		cout << TP << " " << TP.l * testP[i].l << endl;
-		outFile << P << " " << P.l * testP[i].l << endl;
+		cout << P << " "<< P.l + testP[i].l << endl;
+		outFile << P << "\t" << P.l + testP[i].l << endl;
 #else
 		cout << P << endl;
 		outFile << P << endl;

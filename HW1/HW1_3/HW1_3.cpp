@@ -59,11 +59,12 @@ int main()
 		Point2D P = pla.FindLabel(testP[i]);
 
 #ifdef DEBUG
-		cout << P << " " << P.l*testP[i].l << endl;
+		cout << P << " " << P.l + testP[i].l << endl;
+		outFile << P << "\t" << P.l + testP[i].l << endl;
 #else
 		cout << P << endl;
-#endif 		
 		outFile << P << endl;
+#endif 
 	}
 
 	outFile.close();

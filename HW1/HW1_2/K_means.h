@@ -85,7 +85,7 @@ public:
 
 ostream& operator<<(ostream& os, const Point2D& p)
 {
-	os << p.x << ", " << p.y << " " << p.l;
+	os << p.x << "\t" << p.y << "\t" << p.l;
 	return os;
 }
 
