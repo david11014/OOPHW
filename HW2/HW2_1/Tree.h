@@ -8,8 +8,8 @@ github: https://github.com/david11014
 #include <memory>  
 using namespace std;
 //#define DEBUG
-#ifndef K_DTREE_H
-#define K_DTREE_H
+#ifndef TREE_H
+#define TREE_H
 
 class Point2D {
 

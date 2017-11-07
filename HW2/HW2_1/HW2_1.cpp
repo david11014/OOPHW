@@ -35,36 +35,25 @@ int main()
 	
 
 	/*Read train file and test file*/
-	ifstream trainFile,testFile;
+	ifstream PointsFile;
 	ofstream outFile;
 	outFile.open("test-result-1.txt");
-	trainFile.open("train-data.txt");
-	testFile.open("test-data.txt");
+	PointsFile.open("Point_HW2.txt");
 	
-	if (trainFile.is_open())
+	
+	if (PointsFile.is_open())
 	{
 		cout << "Open train data" << endl;
 		for (int i = 0; i < TR_SIZE; i++)
 		{
-			trainFile >> trainP[i].x;
-			trainFile >> trainP[i].y;
-			trainFile >> trainP[i].l;
+			PointsFile >> trainP[i].x;
+			PointsFile >> trainP[i].y;
+			PointsFile >> trainP[i].l;
 			//cout << trainP[i].x << " " << trainP[i].y << " " << trainP[i].l << endl;
 		}
 		cout << "Done load train data" << endl;
 	}
-	if (testFile.is_open())
-	{
-		cout << "Open test data" << endl;
-		for (int i = 0; i < TES_SIZE; i++)
-		{
-			testFile >> testP[i].x;
-			testFile >> testP[i].y;
-			testFile >> testP[i].l;
-			//cout << testP[i].x << " " << testP[i].y << " " << testP[i].l << endl;
-		}
-		cout << "Done load test data" << endl;
-	}	
+	
 	
 	//init K-D tree
 	KDTree trainTree(trainP,TR_SIZE);	
