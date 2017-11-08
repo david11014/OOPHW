@@ -8,7 +8,8 @@ github: https://github.com/david11014
 #include <memory>  
 using namespace std;
 
-#define DEBUG
+//#define DEBUG
+
 #ifndef QUAD_TREE_H
 #define QUAD_TREE_H
 
@@ -23,7 +24,7 @@ public:
 	~Point() {}//#4
 	void Set_data(float, float);//#5
 	float operator[](int i)const;//#6
-	friend std::istream& operator >> (std::istream&, Point&);//#7
+	friend std::istream& operator>>(std::istream&, Point&);//#7
 	friend std::ostream& operator<<(std::ostream&, const Point&);//#8
 };
 class QuadtreeNode

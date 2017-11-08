@@ -8,7 +8,7 @@ github: https://github.com/david11014
 #include <string>
 #include "HW02.h"
 #define RANGE 100
-#define DEBUG
+//#define DEBUG
 
 using namespace std;
 
@@ -18,10 +18,9 @@ int main()
 	Point* P;
 	int PNum;
 
-	/*Read train file and test file*/
+	//Read point file
 	ifstream PointsFile;
-	ofstream outFile;
-	outFile.open("test-result-1.txt");
+		
 	PointsFile.open("Point_HW2.txt");
 		
 	if (PointsFile.is_open())
@@ -61,14 +60,16 @@ int main()
 
 	Point testP;
 	QuadtreeNode *QTCopy = new QuadtreeNode(*QTRoot);
+	QuadtreeNode *QTC= new QuadtreeNode(*QTRoot);
 
+	QTC->~QuadtreeNode();
 
 	while (1)
 	{
 		cin >> testP;
 
-		cout << QTRoot->FindClosestPoint(testP) << endl;
-		cout << QTCopy->FindClosestPoint(testP) << endl;
+		cout << "Quadtree closest point: " << QTRoot->FindClosestPoint(testP) << endl;
+		cout << "Copy Quadtree closest point: " << QTCopy->FindClosestPoint(testP) << endl;
 	}
 		
 	return 0;
@@ -100,7 +101,7 @@ float Point::operator[](int i)const//#6
 	else
 		return 0;
 }
-std::istream& operator >> (std::istream& os, Point& p)//#7
+std::istream& operator>>(std::istream& os, Point& p)//#7
 {
 	float x, y;
 	os >> x >> y;
@@ -126,10 +127,9 @@ QuadtreeNode::QuadtreeNode(const Point& sp, const Point&p, const float s) : size
 	data = new Point(p);
 
 }
-
 QuadtreeNode::QuadtreeNode(const QuadtreeNode& QT) : size(QT.size), separate_point(QT.separate_point), data(QT.data)//#15
 {
-	
+	//copy child node value
 	for (int i = 0; i < 4; i++)
 	{
 		if (QT.nextNode[i] != nullptr)
@@ -139,8 +139,21 @@ QuadtreeNode::QuadtreeNode(const QuadtreeNode& QT) : size(QT.size), separate_poi
 }
 QuadtreeNode::~QuadtreeNode()//#16
 {
+	//clear data
 	if (data != nullptr)
+	{
+#ifdef DEBUG
+		cout << "delete: " << *data << endl;
+#endif // DEBUGs
 		delete data;
+	}
+
+	//clear child node
+	if (nextNode[0] != nullptr) nextNode[0]->~QuadtreeNode();
+	if (nextNode[1] != nullptr) nextNode[1]->~QuadtreeNode();
+	if (nextNode[2] != nullptr) nextNode[2]->~QuadtreeNode();
+	if (nextNode[3] != nullptr) nextNode[3]->~QuadtreeNode();
+
 
 }
 bool QuadtreeNode::InsertPoint(const Point& p)//#17
@@ -149,6 +162,7 @@ bool QuadtreeNode::InsertPoint(const Point& p)//#17
 	bool occupy = false;
 	Point *nsp = new Point();
 
+	//find point's place;
 	if (p[0] >= separate_point[0] && p[1] >= separate_point[1]) // 0
 	{
 		i = 0;
@@ -187,7 +201,8 @@ bool QuadtreeNode::InsertPoint(const Point& p)//#17
 	}
 
 
-	if (nextNode[i] == nullptr)
+	
+	if (nextNode[i] == nullptr) //add node
 	{
 		nextNode[i] = new QuadtreeNode(*nsp, p, size / 2);
 
@@ -199,25 +214,31 @@ bool QuadtreeNode::InsertPoint(const Point& p)//#17
 
 		return true;
 	}
-	else
+	else //find in next level
 		return nextNode[i]->InsertPoint(p);
 
 	return false;
 }
 Point QuadtreeNode::FindClosestPoint(const Point & p) const //#18
 {
-	if (data != nullptr)
-		return *data;
-	else
+	int i = -1;
+	
+	//find point's place;
+	if (p[0] >= separate_point[0] && p[1] >= separate_point[1]) // 0
+		i = 0;
+	else if (p[0] < separate_point[0] && p[1] > separate_point[1]) //1
+		i = 1;
+	else if (p[0] <= separate_point[0] && p[1] <= separate_point[1]) //2
+		i = 2;
+	else if (p[0] > separate_point[0] && p[1] < separate_point[1]) //3
+		i = 3;
+
+	if (nextNode[i] == nullptr && data != nullptr)
 	{
-		if (p[0] >= separate_point[0] && p[1] >= separate_point[1]) // 0
-			return nextNode[0]->FindClosestPoint(p);
-		else if (p[0] < separate_point[0] && p[1] > separate_point[1]) //1
-			return nextNode[1]->FindClosestPoint(p);
-		else if (p[0] <= separate_point[0] && p[1] <= separate_point[1]) //2
-			return nextNode[2]->FindClosestPoint(p);
-		else if (p[0] > separate_point[0] && p[1] < separate_point[1]) //3
-			return nextNode[3]->FindClosestPoint(p);
+		return *data;
 	}
+	else
+		return nextNode[i]->FindClosestPoint(p);
+
 }
 
