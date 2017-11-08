@@ -5,79 +5,193 @@ github: https://github.com/david11014
 ********************************************************/
 #include <iostream>
 #include <fstream>
-#include "Tree.h"
-//#define DEBUG
-#define TR_SIZE 100
-#define TES_SIZE 20
+#include <string>
+#include "HW02.h"
+#define RANGE 100
+#define DEBUG
 
 using namespace std;
-
-Point2D Find(Point2D P, Point2D *trainP, int n)
-{
-	double D = DBL_MAX;
-	int I;
-	for (int i = 0; i < n; i++)
-	{
-		if (P.Distant(trainP[i]) < D)
-		{
-			D = P.Distant(trainP[i]);
-			I = i;
-		}
-			
-	}
-	return trainP[I];
-}
 
 int main()
 {
 	
-	Point2D trainP[TR_SIZE], testP[TES_SIZE];
-	
+	Point* P;
+	int PNum;
 
 	/*Read train file and test file*/
 	ifstream PointsFile;
 	ofstream outFile;
 	outFile.open("test-result-1.txt");
 	PointsFile.open("Point_HW2.txt");
-	
-	
+		
 	if (PointsFile.is_open())
 	{
-		cout << "Open train data" << endl;
-		for (int i = 0; i < TR_SIZE; i++)
-		{
-			PointsFile >> trainP[i].x;
-			PointsFile >> trainP[i].y;
-			PointsFile >> trainP[i].l;
-			//cout << trainP[i].x << " " << trainP[i].y << " " << trainP[i].l << endl;
-		}
-		cout << "Done load train data" << endl;
-	}
-	
-	
-	//init K-D tree
-	KDTree trainTree(trainP,TR_SIZE);	
-
-	cout << "train done" << endl;
-	
-	cout << "find label" << endl;
-	for (int i = 0; i < TES_SIZE; i++)
-	{	
-		Point2D TP = Find(testP[i], trainP, TR_SIZE);
-		Point2D P = trainTree.FindNear(testP[i]);
-
-#ifdef DEBUG
-
-		cout << P << " "<< P.l + testP[i].l << endl;
-		outFile << P << "\t" << P.l + testP[i].l << endl;
-#else
-		cout << P << endl;
-		outFile << P << endl;
-#endif 			
+		cout << "Open points data" << endl;
+		char s[13];
+		PointsFile.get(s,13);
+		cout << s ;
+		PointsFile >> s;
+				
+		PNum = stoi(s);
+		cout << PNum << endl;
+		float x, y;
+		P = new Point[PNum];
 		
+		for (int i = 0; i < PNum; i++)
+		{
+			PointsFile >> P[i];
+			cout << P[i] << endl;			
+		}
+		cout << "Done load points data" << endl;
+	}
+	Point sp(0, 0);
+
+	QuadtreeNode* QTRoot = new QuadtreeNode(sp, P[0], RANGE);
+	
+	for (int i = 1; i < PNum; i++)
+	{	
+#ifdef DEBUG
+		cout << P[i] << QTRoot->InsertPoint(P[i]) << endl;
+#else
+		QTRoot->InsertPoint(P[i]);
+#endif // DEBUG		
 	}
 
-	
+	cout << "Done Build Quadtree" << endl;
+
 	getchar();
+	
 	return 0;
 }
+
+
+//Point
+Point::Point()//#2
+{
+	x = 0;
+	y = 0;
+}
+Point::Point(float a, float b)//#3
+{
+	x = a;
+	y = b;
+}
+void Point::Set_data(float a, float b)//#5
+{
+	x = a;
+	y = b;
+}
+float Point::operator[](int i)const//#6
+{
+	if (i == 0)
+		return x;
+	else if (i == 1)
+		return y;
+	else
+		return 0;
+}
+std::istream& operator >> (std::istream& os, Point& p)//#7
+{
+	float x, y;
+	os >> x >> y;
+	p.Set_data(x, y);
+	return os;
+}
+std::ostream& operator<<(std::ostream& os, const Point& p)//#8
+{
+
+	os << p[0] << "\t" << p[1];
+	return os;
+}
+
+//QuadtreeNode
+QuadtreeNode::QuadtreeNode(const Point& sp, const Point&p, const float s) : size(s), separate_point(sp)//#14
+{
+
+	nextNode[0] = nullptr;
+	nextNode[1] = nullptr;
+	nextNode[2] = nullptr;
+	nextNode[3] = nullptr;
+
+	data = new Point(p);
+
+}
+
+QuadtreeNode::QuadtreeNode(const QuadtreeNode& QT) : size(QT.size), separate_point(QT.separate_point), data(QT.data)//#15
+{
+	
+	for (int i = 0; i < 4; i++)
+	{
+		if (QT.nextNode[i] != nullptr)
+			nextNode[i] = new QuadtreeNode(*(QT.nextNode[i]));
+	}
+	
+}
+QuadtreeNode::~QuadtreeNode()//#16
+{
+	if (data != nullptr)
+		delete data;
+
+}
+bool QuadtreeNode::InsertPoint(const Point& p)//#17
+{
+	int i = -1;
+	bool occupy = false;
+	Point *nsp = new Point();
+
+	if (p[0] >= separate_point[0] && p[1] >= separate_point[1]) // 0
+	{
+		i = 0;
+		nsp = new Point(separate_point[0] + size / 2, separate_point[1] + size / 2);
+
+		if (data != nullptr)
+			if ((*data)[0] >= separate_point[0] && (*data)[1] >= separate_point[1])
+				occupy = true;
+	}
+	else if (p[0] < separate_point[0] && p[1] > separate_point[1]) //1
+	{
+		i = 1;
+		nsp = new Point(separate_point[0] - size / 2, separate_point[1] + size / 2);
+
+		if (data != nullptr)
+			if ((*data)[0] < separate_point[0] && (*data)[1] < separate_point[1])
+				occupy = true;
+	}
+	else if (p[0] <= separate_point[0] && p[1] <= separate_point[1]) //2
+	{
+		i = 2;
+		nsp = new Point(separate_point[0] - size / 2, separate_point[1] - size / 2);
+
+		if (data != nullptr)
+			if ((*data)[0] <= separate_point[0] && (*data)[1] <= separate_point[1])
+				occupy = true;
+	}
+	else if (p[0] > separate_point[0] && p[1] < separate_point[1]) //3
+	{
+		i = 3;
+		nsp = new Point(separate_point[0] + size / 2, separate_point[1] - size / 2);
+
+		if (data != nullptr)
+			if ((*data)[0] > separate_point[0] && (*data)[1] < separate_point[1])
+				occupy = true;
+	}
+
+
+	if (nextNode[i] == nullptr)
+	{
+		nextNode[i] = new QuadtreeNode(*nsp, p, size / 2);
+
+		if (occupy)
+		{
+			nextNode[i]->InsertPoint(*data);
+			data = nullptr;
+		}
+
+		return true;
+	}
+	else
+		return nextNode[i]->InsertPoint(p);
+
+	return false;
+}
+//¡K¡K¡K¡K QuadtreeNode::FindClosestPoint(¡K¡K¡K.)const;//#18
