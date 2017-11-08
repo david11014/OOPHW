@@ -59,8 +59,18 @@ int main()
 
 	cout << "Done Build Quadtree" << endl;
 
-	getchar();
-	
+	Point testP;
+	QuadtreeNode *QTCopy = new QuadtreeNode(*QTRoot);
+
+
+	while (1)
+	{
+		cin >> testP;
+
+		cout << QTRoot->FindClosestPoint(testP) << endl;
+		cout << QTCopy->FindClosestPoint(testP) << endl;
+	}
+		
 	return 0;
 }
 
@@ -194,4 +204,20 @@ bool QuadtreeNode::InsertPoint(const Point& p)//#17
 
 	return false;
 }
-//¡K¡K¡K¡K QuadtreeNode::FindClosestPoint(¡K¡K¡K.)const;//#18
+Point QuadtreeNode::FindClosestPoint(const Point & p) const //#18
+{
+	if (data != nullptr)
+		return *data;
+	else
+	{
+		if (p[0] >= separate_point[0] && p[1] >= separate_point[1]) // 0
+			return nextNode[0]->FindClosestPoint(p);
+		else if (p[0] < separate_point[0] && p[1] > separate_point[1]) //1
+			return nextNode[1]->FindClosestPoint(p);
+		else if (p[0] <= separate_point[0] && p[1] <= separate_point[1]) //2
+			return nextNode[2]->FindClosestPoint(p);
+		else if (p[0] > separate_point[0] && p[1] < separate_point[1]) //3
+			return nextNode[3]->FindClosestPoint(p);
+	}
+}
+

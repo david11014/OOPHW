@@ -40,7 +40,7 @@ public:
 	QuadtreeNode(const QuadtreeNode&);//#15
 	~QuadtreeNode();//#16
 	bool InsertPoint(const Point&);//#17
-	Point FindClosestPoint(¡K¡K¡K.)const;//#18
+	Point FindClosestPoint(const Point&)const;//#18
 	
 };
 
