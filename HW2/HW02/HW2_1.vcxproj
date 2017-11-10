@@ -112,6 +112,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="HW02.cpp" />
+    <ClCompile Include="useHW02.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HW02.h" />

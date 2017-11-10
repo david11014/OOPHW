@@ -4,89 +4,13 @@ Write by david1104
 github: https://github.com/david11014
 ********************************************************/
 #include <iostream>
-#include <fstream>
-#include <string>
 #include "HW02.h"
 #define RANGE 100
-//#define DEBUG
-
-using namespace std;
-
-int main()
-{
-	
-	Point* P;
-	int PNum;
-
-	//Read point file
-	ifstream PointsFile;
-		
-	PointsFile.open("Point_HW2.txt");
-		
-	if (PointsFile.is_open())
-	{
-		cout << "Open points data" << endl;
-		char s[13];
-		PointsFile.get(s,13);
-		cout << s ;
-		PointsFile >> s;
-				
-		PNum = stoi(s);
-		cout << PNum << endl;
-		float x, y;
-		P = new Point[PNum];
-		
-		for (int i = 0; i < PNum; i++)
-		{
-			PointsFile >> P[i];
-			cout << P[i] << endl;			
-		}
-		cout << "Done load points data" << endl;
-	}
-	Point sp(0, 0);
-
-	QuadtreeNode* QTRoot = new QuadtreeNode(sp, P[0], RANGE);
-	
-	for (int i = 1; i < PNum; i++)
-	{	
-#ifdef DEBUG
-		cout << P[i] << QTRoot->InsertPoint(P[i]) << endl;
-#else
-		QTRoot->InsertPoint(P[i]);
-#endif // DEBUG		
-	}
-
-	cout << "Done Build Quadtree" << endl;
-
-	Point testP;
-	QuadtreeNode *QTCopy = new QuadtreeNode(*QTRoot);
-	QuadtreeNode *QTC= new QuadtreeNode(*QTRoot);
-
-	QTC->~QuadtreeNode();
-
-	while (1)
-	{
-		cin >> testP;
-
-		cout << "Quadtree closest point: " << QTRoot->FindClosestPoint(testP) << endl;
-		cout << "Copy Quadtree closest point: " << QTCopy->FindClosestPoint(testP) << endl;
-	}
-		
-	return 0;
-}
-
 
 //Point
-Point::Point()//#2
-{
-	x = 0;
-	y = 0;
-}
-Point::Point(float a, float b)//#3
-{
-	x = a;
-	y = b;
-}
+Point::Point() : x(0), y(0) {};//#2
+Point::Point(float a, float b) : x(a), y(a) {};//#3
+
 void Point::Set_data(float a, float b)//#5
 {
 	x = a;
@@ -110,7 +34,6 @@ std::istream& operator>>(std::istream& os, Point& p)//#7
 }
 std::ostream& operator<<(std::ostream& os, const Point& p)//#8
 {
-
 	os << p[0] << "\t" << p[1];
 	return os;
 }

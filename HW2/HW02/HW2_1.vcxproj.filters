@@ -23,5 +23,8 @@
     <ClCompile Include="HW02.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="useHW02.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
