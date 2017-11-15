@@ -80,66 +80,81 @@ QuadtreeNode::~QuadtreeNode()//#16
 
 }
 bool QuadtreeNode::InsertPoint(const Point& p)//#17
-{
+{	
+
+	// find data's place if data have value;
+	if (data != nullptr)
+	{
+		Point *data_nsp = new Point();
+		int j = -1;
+		if ((*data)[0] >= separate_point[0] && (*data)[1] >= separate_point[1]) // 0
+		{
+			j = 0;
+			data_nsp = new Point(separate_point[0] + size / 2, separate_point[1] + size / 2);
+		}
+		else if ((*data)[0] < separate_point[0] && (*data)[1] > separate_point[1]) //1
+		{
+			j = 1;
+			data_nsp = new Point(separate_point[0] - size / 2, separate_point[1] + size / 2);
+		}
+		else if ((*data)[0] <= separate_point[0] && (*data)[1] <= separate_point[1]) //2
+		{
+			j = 2;
+			data_nsp = new Point(separate_point[0] - size / 2, separate_point[1] - size / 2);
+		}
+		else if ((*data)[0] > separate_point[0] && (*data)[1] < separate_point[1]) //3
+		{
+			j = 3;
+			data_nsp = new Point(separate_point[0] + size / 2, separate_point[1] - size / 2);
+		}
+
+		if (nextNode[j] == nullptr) //add node
+		{
+			nextNode[j] = new QuadtreeNode(*data_nsp, *data, size / 2);
+		}
+		else //find in next level
+		{
+			nextNode[j]->InsertPoint(*data);
+		}
+
+		data = nullptr;
+	}
+
 	int i = -1;
-	bool occupy = false;
-	Point *nsp = new Point();
+	Point *point_nsp = new Point();
 
 	//find point's place;
 	if (p[0] >= separate_point[0] && p[1] >= separate_point[1]) // 0
 	{
 		i = 0;
-		nsp = new Point(separate_point[0] + size / 2, separate_point[1] + size / 2);
-
-		if (data != nullptr)
-			if ((*data)[0] >= separate_point[0] && (*data)[1] >= separate_point[1])
-				occupy = true;
+		point_nsp = new Point(separate_point[0] + size / 2, separate_point[1] + size / 2);
 	}
 	else if (p[0] < separate_point[0] && p[1] > separate_point[1]) //1
 	{
 		i = 1;
-		nsp = new Point(separate_point[0] - size / 2, separate_point[1] + size / 2);
-
-		if (data != nullptr)
-			if ((*data)[0] < separate_point[0] && (*data)[1] < separate_point[1])
-				occupy = true;
+		point_nsp = new Point(separate_point[0] - size / 2, separate_point[1] + size / 2);
 	}
 	else if (p[0] <= separate_point[0] && p[1] <= separate_point[1]) //2
 	{
 		i = 2;
-		nsp = new Point(separate_point[0] - size / 2, separate_point[1] - size / 2);
-
-		if (data != nullptr)
-			if ((*data)[0] <= separate_point[0] && (*data)[1] <= separate_point[1])
-				occupy = true;
+		point_nsp = new Point(separate_point[0] - size / 2, separate_point[1] - size / 2);
 	}
 	else if (p[0] > separate_point[0] && p[1] < separate_point[1]) //3
 	{
 		i = 3;
-		nsp = new Point(separate_point[0] + size / 2, separate_point[1] - size / 2);
-
-		if (data != nullptr)
-			if ((*data)[0] > separate_point[0] && (*data)[1] < separate_point[1])
-				occupy = true;
+		point_nsp = new Point(separate_point[0] + size / 2, separate_point[1] - size / 2);
 	}
 
-
-	
 	if (nextNode[i] == nullptr) //add node
 	{
-		nextNode[i] = new QuadtreeNode(*nsp, p, size / 2);
-
-		if (occupy)
-		{
-			nextNode[i]->InsertPoint(*data);
-			data = nullptr;
-		}
-
+		nextNode[i] = new QuadtreeNode(*point_nsp, p, size / 2);
 		return true;
 	}
 	else //find in next level
+	{
 		return nextNode[i]->InsertPoint(p);
-
+	}
+	
 	return false;
 }
 Point QuadtreeNode::FindClosestPoint(const Point & p) const //#18
@@ -162,6 +177,13 @@ Point QuadtreeNode::FindClosestPoint(const Point & p) const //#18
 	}
 	else
 		return nextNode[i]->FindClosestPoint(p);
+
+	//if (data == nullptr)
+	//{
+	//	return nextNode[i]->FindClosestPoint(p);
+	//}
+	//else
+	//	return *data;
 
 }
 
