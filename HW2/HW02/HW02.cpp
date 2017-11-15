@@ -108,14 +108,7 @@ bool QuadtreeNode::InsertPoint(const Point& p)//#17
 			data_nsp = new Point(separate_point[0] + size / 2, separate_point[1] - size / 2);
 		}
 
-		if (nextNode[j] == nullptr) //add node
-		{
-			nextNode[j] = new QuadtreeNode(*data_nsp, *data, size / 2);
-		}
-		else //find in next level
-		{
-			nextNode[j]->InsertPoint(*data);
-		}
+		nextNode[j] = new QuadtreeNode(*data_nsp, *data, size / 2);
 
 		data = nullptr;
 	}
@@ -159,31 +152,24 @@ bool QuadtreeNode::InsertPoint(const Point& p)//#17
 }
 Point QuadtreeNode::FindClosestPoint(const Point & p) const //#18
 {
-	int i = -1;
-	
-	//find point's place;
-	if (p[0] >= separate_point[0] && p[1] >= separate_point[1]) // 0
-		i = 0;
-	else if (p[0] < separate_point[0] && p[1] > separate_point[1]) //1
-		i = 1;
-	else if (p[0] <= separate_point[0] && p[1] <= separate_point[1]) //2
-		i = 2;
-	else if (p[0] > separate_point[0] && p[1] < separate_point[1]) //3
-		i = 3;
 
-	if (nextNode[i] == nullptr && data != nullptr)
+	if (data == nullptr)
 	{
-		return *data;
+		//find point's place;
+		int i = -1;				
+		if (p[0] >= separate_point[0] && p[1] >= separate_point[1]) // 0
+			i = 0;
+		else if (p[0] < separate_point[0] && p[1] > separate_point[1]) //1
+			i = 1;
+		else if (p[0] <= separate_point[0] && p[1] <= separate_point[1]) //2
+			i = 2;
+		else if (p[0] > separate_point[0] && p[1] < separate_point[1]) //3
+			i = 3;
+
+		return nextNode[i]->FindClosestPoint(p);
 	}
 	else
-		return nextNode[i]->FindClosestPoint(p);
-
-	//if (data == nullptr)
-	//{
-	//	return nextNode[i]->FindClosestPoint(p);
-	//}
-	//else
-	//	return *data;
+		return *data;
 
 }
 

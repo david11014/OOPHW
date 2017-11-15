@@ -7,8 +7,10 @@ github: https://github.com/david11014
 #include <fstream>
 #include <string>
 #include "HW02.h"
-#define RANGE 100
+
 //#define DEBUG
+#define RANGE 100
+#define ABS(x) (x) > 0?(x):(-(x))
 
 using namespace std;
 
@@ -45,8 +47,10 @@ int main()
 	}
 	Point sp(0, 0);
 
-	QuadtreeNode* QTRoot = new QuadtreeNode(sp, P[0], RANGE);
+	cout << "Build Quadtree" << endl;
 
+	QuadtreeNode* QTRoot = new QuadtreeNode(sp, P[0], RANGE);
+	
 	for (int i = 1; i < PNum; i++)
 	{
 #ifdef DEBUG
@@ -71,8 +75,14 @@ int main()
 	{
 		cout << "Please enter the point:" << endl;
 		cin >> testP;
-		cout << "Quadtree closest point: " << QTRoot->FindClosestPoint(testP) << endl;
-		cout << "Copy Quadtree closest point: " << QTCopy->FindClosestPoint(testP) << endl;
+
+		if (ABS(testP[0]) > RANGE || ABS(testP[1]) > RANGE)
+			cout << "Point out of range!" << endl;
+		else
+		{
+			cout << "Quadtree closest point: " << QTRoot->FindClosestPoint(testP) << endl;
+			cout << "Copy Quadtree closest point: " << QTCopy->FindClosestPoint(testP) << endl;
+		}		
 	}
 
 	return 0;
