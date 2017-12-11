@@ -9,11 +9,6 @@ github: https://github.com/david11014
 int main()
 {
 
-	int *a = new int[6];
-
-	delete[] a;
-
-	a = new int[10];
 
 	return 0;
 }
