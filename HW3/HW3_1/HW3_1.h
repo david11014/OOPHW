@@ -116,6 +116,7 @@ public:
 	virtual double Area() = 0;
 	virtual double Perimeter() = 0;
 	virtual double Volume() = 0;
+
 };
 
 class Pyramid : public IGeometry
@@ -131,6 +132,12 @@ public:
 	
 	void SetVertices(Point*);
 	Point Center();
+	void show()
+	{
+		for (int i = 0; i < 4; i++)
+			cout << vertices[i] << endl;			
+	}
+
 
 	virtual double Area();
 	virtual double Perimeter();
@@ -142,16 +149,24 @@ private:
 class Cuboid : public IGeometry
 {
 public:
-	Cuboid();	
+	Cuboid();		
 	Cuboid(const Cuboid &);
+	Cuboid(Point, Point);
 	Cuboid(Point*);
 
 	~Cuboid();
 	Cuboid operator= (const Cuboid & );
 
 	void SetVertices(Point*);
+	void SetVertices(Point, Point);
 	double* SideLength();
 	double* SideArea();	
+
+	void show()
+	{
+		for (int i = 0; i < 8; i++)
+			cout << vertices[i] << endl;
+	}
 
 	virtual double Area();
 	virtual double Perimeter();
@@ -166,12 +181,20 @@ public:
 	Cylinder();
 	~Cylinder();
 	Cylinder(const Cylinder &);
+	Cylinder(Point, Point, double);
 	Cylinder operator= (const Cylinder & );
 
 	void SetCylinder(Point,Point,double);
 	double Height();
 	double BottomArea();
 	double SideArea();
+
+	void show()
+	{		
+		cout << Top << endl;
+		cout << Bottom << endl;
+		cout << r << endl;
+	}
 
 	virtual double Area();
 	virtual double Perimeter();
