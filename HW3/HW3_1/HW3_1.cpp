@@ -4,74 +4,93 @@ Pyramid::Pyramid()
 {
 	vertices = new Point[4];
 }
+Pyramid::Pyramid(const Pyramid & P)
+{
+	vertices = new Point[4];
+	Pyramid(P.vertices);
+}
+Pyramid::Pyramid(Point* ps)
+{
+	vertices = new Point[4];
+	SetVertices(ps);
+}
 Pyramid::~Pyramid()
 {
 	delete[] vertices;
 }
-
-Pyramid::Pyramid(const Pyramid &)
+Pyramid Pyramid::operator=(const Pyramid & P)
 {
-
-
+	Pyramid p(P);
+	return p;
 }
 
-Pyramid & Pyramid::operator=(const Pyramid & P)
-{
-	Pyramid *P = new Pyramid();
-
-	
-
-	return &P;
-}
-
-void Pyramid::SetVertices(Point *)
-{
-
-
+void Pyramid::SetVertices(Point * ps)
+{	
+	vertices[0] = ps[0];
+	vertices[1] = ps[1];
+	vertices[2] = ps[2];
+	vertices[3] = ps[3];
 }
 
 Point Pyramid::Center()
-{
-	return Point();
+{	
+	return (vertices[1] + vertices[2] + vertices[3] - vertices[0] * 3) / 4;
 }
 
 double Pyramid::Area()
 {
-	return 0.0;
+	double A = 0;
+	A += (vertices[1] - vertices[0]).CrossArea((vertices[2] - vertices[0])) / 2;
+	A += (vertices[2] - vertices[0]).CrossArea((vertices[3] - vertices[0])) / 2;
+	A += (vertices[3] - vertices[0]).CrossArea((vertices[1] - vertices[0])) / 2;
+	A += (vertices[1] - vertices[3]).CrossArea((vertices[2] - vertices[3])) / 2;
+	return A;
 }
 
 double Pyramid::Perimeter()
 {
-	return 0.0;
+	double A = 0;
+	A += (vertices[1] - vertices[0]).Abs();
+	A += (vertices[2] - vertices[0]).Abs();
+	A += (vertices[3] - vertices[0]).Abs();
+	A += (vertices[1] - vertices[2]).Abs();
+	A += (vertices[2] - vertices[3]).Abs();
+	A += (vertices[3] - vertices[1]).Abs();
+	return	A;
 }
 
 double Pyramid::Volume()
 {
-	return 0.0;
+	return  (vertices[1] - vertices[0]).Dot((vertices[2] - vertices[0]).Cross(vertices[3] - vertices[0])) / 6;
 }
 
 Cuboid::Cuboid()
 {
 	vertices = new Point[8];
 }
-
+Cuboid::Cuboid(Point* ps)
+{
+	vertices = new Point[8];
+	SetVertices(ps);
+}
+Cuboid::Cuboid(const Cuboid & c)
+{
+	Cuboid(c.vertices);
+}
 Cuboid::~Cuboid()
 {
 	delete[] vertices;
 }
-
-Cuboid::Cuboid(const Cuboid &)
+Cuboid Cuboid::operator=(const Cuboid & c)
 {
+	Cuboid C(c);
+	return C;
 }
 
-Cuboid & Cuboid::operator=(const Cuboid &)
+void Cuboid::SetVertices(Point * ps)
 {
-	Cuboid C;
-	return *C;
-}
-
-void Cuboid::SetVertices(Point *)
-{
+	for (int i = 0; i < 8; i++)
+		vertices[i] = ps[i];
 }
 
 double * Cuboid::SideLength()
@@ -111,10 +130,10 @@ Cylinder::Cylinder(const Cylinder &)
 {
 }
 
-Cylinder & Cylinder::operator=(const Cylinder &)
+Cylinder Cylinder::operator=(const Cylinder & c)
 {
-	Cylinder C;
-	return *C;
+	Cylinder C(c);
+	return C;
 }
 
 void Cylinder::SetCylinder(Point, Point, double)

@@ -25,8 +25,7 @@ public:
 		z = 0.0;
 	};
 	Point(double a, double b, double c) :x(a), y(b), z(c) {};
-
-
+	
 	double& operator[](unsigned int i)
 	{
 		return p[i];
@@ -69,13 +68,23 @@ public:
 		return sqrt((p[0] - P[0])*(p[0] - P[0]) + (p[1] - P[1])*(p[1] - P[1]) + (p[2] - P[2])*(p[2] - P[2]));
 	}
 
-	void show() {
+	double Abs()
+	{
+		return sqrt(p[0]*p[0] + p[1]*p[1] + p[2]*p[2]);
+	}
+
+	void show() 
+	{
 		std::cout << p[0] << " " << p[1] << " " << p[2];
 	}
 
 	Point Cross(Point P)
 	{
 		return Point(p[1] * P[2] - p[2] * P[1], p[2] * P[0] - p[0] * P[2], p[0] * P[1] - p[1] * P[0]);
+	}
+	double CrossArea(Point P)
+	{
+		return (this->Cross(P)).Abs();
 	}
 
 	double Dot(Point P)
@@ -90,10 +99,11 @@ public:
 
 	}
 
-	friend ostream& operator<<(ostream&, const Point&);
+	friend ostream& operator<<(ostream& os, const Point& p);
 
 };
 
+inline
 ostream& operator<<(ostream& os, const Point& p)
 {
 	os << p.x << "\t" << p.y << "\t" << p.z;
@@ -104,23 +114,27 @@ class IGeometry
 {
 public:
 	virtual double Area() = 0;
-	virtual double Perimeter() = 0;	virtual double Volume() = 0;
+	virtual double Perimeter() = 0;
+	virtual double Volume() = 0;
 };
 
 class Pyramid : public IGeometry
 {
 	
 public:
-	Pyramid();
-	~Pyramid();
+	Pyramid();	
 	Pyramid(const Pyramid &);
-	Pyramid & operator= (const Pyramid & );
+	Pyramid(Point* );
+	~Pyramid();
+
+	Pyramid operator= (const Pyramid & );
 	
 	void SetVertices(Point*);
 	Point Center();
 
 	virtual double Area();
-	virtual double Perimeter();	virtual double Volume();
+	virtual double Perimeter();
+	virtual double Volume();
 private:
 	Point* vertices;
 };
@@ -128,17 +142,20 @@ private:
 class Cuboid : public IGeometry
 {
 public:
-	Cuboid();
-	~Cuboid();
+	Cuboid();	
 	Cuboid(const Cuboid &);
-	Cuboid & operator= (const Cuboid & );
+	Cuboid(Point*);
+
+	~Cuboid();
+	Cuboid operator= (const Cuboid & );
 
 	void SetVertices(Point*);
 	double* SideLength();
 	double* SideArea();	
 
 	virtual double Area();
-	virtual double Perimeter();	virtual double Volume();
+	virtual double Perimeter();
+	virtual double Volume();
 private:
 	Point* vertices;
 };
@@ -149,7 +166,7 @@ public:
 	Cylinder();
 	~Cylinder();
 	Cylinder(const Cylinder &);
-	Cylinder & operator= (const Cylinder & );
+	Cylinder operator= (const Cylinder & );
 
 	void SetCylinder(Point,Point,double);
 	double Height();
@@ -157,7 +174,8 @@ public:
 	double SideArea();
 
 	virtual double Area();
-	virtual double Perimeter();	virtual double Volume();
+	virtual double Perimeter();
+	virtual double Volume();
 private:
 	Point Top, Bottom;
 	double r;
