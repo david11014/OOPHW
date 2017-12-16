@@ -47,6 +47,7 @@ int main()
 		delete[] l;
 		delete[] A;
 
+		cout << "input enter to generate new data\ninput 'q' to exit\n";
 	} while ('q' != getchar());
 
 		
