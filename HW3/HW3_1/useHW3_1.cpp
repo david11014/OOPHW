@@ -23,13 +23,32 @@ int main()
 		Cylinder *Cy = dynamic_cast<Cylinder*>(arr[2]);
 
 
-		cout << "Pyramid\n";
-		cout << "Area:" << arr[0]->Area() << " Perimete:" << arr[0]->Perimeter() << " Volume:" << arr[0]->Volume() << endl;		cout << "Center:" << Py->Center() << endl; 		Py->show();		cout << "Cuboid\n";
-		cout << "Area:" << arr[1]->Area() << " Perimete:" << arr[1]->Perimeter() << " Volume:" << arr[1]->Volume() << endl;		double *l = Cu->SideLength();		double *A = Cu->SideArea();		cout << "SideLength:" << l[0] << " " << l[1] << " " << l[2] << " " << endl;		cout << "SideArea:" << A[0] << " " << A[1] << " " << A[2] << " " << endl;		Cu->show();				cout << "Cylinder\n";
-		cout << "Area:" << arr[2]->Area() << " Perimete:" << arr[2]->Perimeter() << " Volume:" << arr[2]->Volume() << endl;		cout << "Height:" << Cy->Height() << " BottomArea:" << Cy->BottomArea() << " SideArea:" << Cy->SideArea() << endl;		Cy->show();
+		cout << "Pyramid\nvertices\n";
+		Py->show();
+		cout << "Area:" << arr[0]->Area() << " Perimete:" << arr[0]->Perimeter() << " Volume:" << arr[0]->Volume() << endl;
+		cout << "Center:" << Py->Center() << endl;
+		cout << "====================================================\n";
 
-		delete[] l;		delete[] A;
+		cout << "Cuboid\nvertices\n";
+		Cu->show();
+		cout << "Area:" << arr[1]->Area() << " Perimete:" << arr[1]->Perimeter() << " Volume:" << arr[1]->Volume() << endl;
+		double *l = Cu->SideLength();
+		double *A = Cu->SideArea();
+		cout << "SideLength:" << l[0] << " " << l[1] << " " << l[2] << " " << endl;
+		cout << "SideArea:" << A[0] << " " << A[1] << " " << A[2] << " " << endl;
+		cout << "====================================================\n";
 
-	} while ('q' != getchar());		
+		cout << "Cylinder\n";
+		Cy->show();
+		cout << "Area:" << arr[2]->Area() << " Perimete:" << arr[2]->Perimeter() << " Volume:" << arr[2]->Volume() << endl;
+		cout << "Height:" << Cy->Height() << " BottomArea:" << Cy->BottomArea() << " SideArea:" << Cy->SideArea() << endl;
+		cout << "====================================================\n\n";
+
+		delete[] l;
+		delete[] A;
+
+	} while ('q' != getchar());
+
+		
 	return 0;
 }

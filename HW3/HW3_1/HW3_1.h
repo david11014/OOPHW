@@ -191,9 +191,9 @@ public:
 
 	void show()
 	{		
-		cout << Top << endl;
-		cout << Bottom << endl;
-		cout << r << endl;
+		cout << "Top:" << Top << endl;
+		cout << "Bottom" << Bottom << endl;
+		cout << "r" << r << endl;
 	}
 
 	virtual double Area();
