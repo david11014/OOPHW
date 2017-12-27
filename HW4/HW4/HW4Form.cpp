@@ -1,0 +1,15 @@
+#include "HW4Form.h"
+using namespace System;
+using namespace System::Windows::Forms;
+[STAThread]
+
+void main()
+{
+	Application::EnableVisualStyles();
+	Application::SetCompatibleTextRenderingDefault(false);
+
+	HW4::HW4Form mainform;
+
+	Application::Run(%mainform);
+
+}
