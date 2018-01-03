@@ -18,9 +18,66 @@
     <ClCompile Include="MainForm.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
+    <ClCompile Include="AABBtree.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="BoundBox.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="OctCloud.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="STLmodel.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="STLmodel_algorithm.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="VBOobj.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="myMath.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainForm.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="AABBtree.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="BoundBox.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="myMath.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="myModelbase.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="myuiobj.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="OBJrender.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="OctCloud.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="STLmodel.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="VBOobj.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="time_measure.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="myFloatingPoint.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>
