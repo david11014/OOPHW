@@ -24,7 +24,10 @@ int main()
 
 	start = std::chrono::steady_clock::now();//紀錄移除重複點開始時間
 
-											 //請將移除重複點演算法撰寫於此
+	
+
+
+
 
 	end = std::chrono::steady_clock::now();//紀錄移除重複點結束時間
 
