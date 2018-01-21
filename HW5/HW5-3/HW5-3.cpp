@@ -7,8 +7,13 @@ github: https://github.com/david11014
 #include <iostream>
 #include <iomanip>
 #include <chrono>
+#include <map>
+#include <set>
+#include <unordered_map>
+#include <unordered_set>
 #include "Point.h"
 
+using namespace std;
 Point* LoadPoint(const char*, unsigned int&);
 
 int main()
@@ -23,16 +28,53 @@ int main()
 	std::cout << "Number of point " << nPoint << std::endl;
 
 	start = std::chrono::steady_clock::now();//¬ö¿ý²¾°£­«½ÆÂI¶}©l®É¶¡
-
+	unsigned int count = 0;
+	map<float, map<float, set<float>>> point_map;
 	
+	for (auto it = point_array; it < point_array + nPoint; it++)
+	{
+		auto map_itx = point_map.find(it->x);
+		if (map_itx == point_map.end())
+		{
+			set<float> z;
+			z.insert(it->z);
 
+			map<float, set<float>> y;
+			pair<float, set<float>> py(it->y, z);
+			y.insert(py);
 
+			pair<float, map<float, set<float>>> px(it->x, y);
+			point_map.insert(px);
+			count++;
+		}
+		else
+		{
+			auto map_ity = map_itx->second.find(it->y);
+			if (map_ity == map_itx->second.end())
+			{
+				set<float> z;
+				z.insert(it->z);				
+				pair<float, set<float>> py(it->y, z);
+				map_itx->second.insert(py);
+				count++;
+			}
+			else
+			{
+				auto map_itz = map_ity->second.find(it->z);
+				if (map_itz == map_ity->second.end())
+				{			
+					map_ity->second.insert(it->z);
+					count++;
+				}
+			}
+		}
 
+	}
 
 	end = std::chrono::steady_clock::now();//¬ö¿ý²¾°£­«½ÆÂIµ²§ô®É¶¡
 
 	std::cout << "Time " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
-	std::cout << /*²¾°£­«½ÆÂI«áªºÂI­Ó¼Æ*/ << std::endl;
+	std::cout << count << std::endl;
 
 	//¦b¦¹¥[¤J¼gÀÉµ{¦¡½X
 
@@ -101,3 +143,4 @@ Point* LoadPoint(const char* filename, unsigned int& nPoint)		// ±q¤å¦rÀÉÅª¤J¦h­
 
 	return pPoint;
 }
+

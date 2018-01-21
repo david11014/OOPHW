@@ -17,12 +17,12 @@ class Point {
 public:
 	union
 	{
-		double p[3];
+		float p[3];
 		struct
 		{
-			double x;
-			double y;
-			double z;
+			float x;
+			float y;
+			float z;
 		};
 	};
 
@@ -32,9 +32,9 @@ public:
 		y = 0.0;
 		z = 0.0;
 	};
-	Point(double a, double b, double c) :x(a), y(b), z(c) {};
+	Point(float a, float b, float c) :x(a), y(b), z(c) {};
 
-	double& operator[](unsigned int i)
+	float& operator[](unsigned int i)
 	{
 		return p[i];
 	}
@@ -54,7 +54,7 @@ public:
 		p.z = this->z - P.z;
 		return p;
 	}
-	Point operator*(double a)
+	Point operator*(float a)
 	{
 		Point p;
 		p.x = (this->x) * a;
@@ -62,7 +62,7 @@ public:
 		p.z = (this->z) * a;
 		return p;
 	}
-	Point operator/(double a)
+	Point operator/(float a)
 	{
 		Point p;
 		p.x = (this->x) / a;
@@ -71,12 +71,19 @@ public:
 		return p;
 	}
 
-	double Distant(Point P)
+	friend inline bool operator==(const Point &a, const Point &b) {
+		return (a.x == b.x) && (a.y == b.y) && (a.z == b.z);
+	}
+	friend inline bool operator!=(const Point &a, const Point &b) {
+		return !(a==b);
+	}
+
+	float Distant(Point P)
 	{
 		return sqrt((p[0] - P[0])*(p[0] - P[0]) + (p[1] - P[1])*(p[1] - P[1]) + (p[2] - P[2])*(p[2] - P[2]));
 	}
 
-	double Abs()
+	float Abs()
 	{
 		return sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
 	}
@@ -90,21 +97,30 @@ public:
 	{
 		return Point(p[1] * P[2] - p[2] * P[1], p[2] * P[0] - p[0] * P[2], p[0] * P[1] - p[1] * P[0]);
 	}
-	double CrossArea(Point P)
+	float CrossArea(Point P)
 	{
 		return (this->Cross(P)).Abs();
 	}
 
-	double Dot(Point P)
+	float Dot(Point P)
 	{
 		return p[0] * P[0] + p[1] * P[1] + p[2] * P[2];
 	}
 
 	Point Unit()
 	{
-		double L = Distant(Point(0, 0, 0));
+		float L = Distant(Point(0, 0, 0));
 		return Point(p[0] / L, p[1] / L, p[2] / L);
 
+	}
+
+	size_t hash()
+	{
+		size_t hx = std::hash<float>()(x);
+		size_t hy = std::hash<float>()(y);
+		size_t hz = std::hash<float>()(z);
+
+		return ((hx ^ (hy << 1)) >> 1) ^ (hz << 1);
 	}
 
 	friend ostream& operator<<(ostream& os, const Point& p);
@@ -121,13 +137,18 @@ ostream& operator<<(ostream& os, const Point& p)
 namespace std
 {
 	template <>
-	struct hash< Point>
+	struct hash<Point>
 	{
-		size_t operator()(const  Point& k) const
+		size_t operator()(Point& k) const
 		{
-			size_t hx = hash<double>()(k.x);
-			size_t hy = hash<double>()(k.y);
-			size_t hz = hash<double>()(k.z);
+			//double x, y, z;
+			//x = k.x;
+			//y = k.y;
+			//z = k.z;
+
+			size_t hx = hash<float>()(k.x);
+			size_t hy = hash<float>()(k.y);
+			size_t hz = hash<float>()(k.z);
 
 			return ((hx ^ (hy << 1)) >> 1) ^ (hz << 1) ;
 		}
