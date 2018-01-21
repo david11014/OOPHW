@@ -3,17 +3,21 @@ NCKU Department of Mechanical engineering OOP Homework 5
 Write by david1104
 github: https://github.com/david11014
 ********************************************************/
+/*請使用release 組態編譯*/
+
 #include <fstream>
 #include <iostream>
 #include <iomanip>
 #include <chrono>
-#include <map>
-#include <set>
-#include <unordered_map>
 #include <unordered_set>
+#include <ppl.h>
+#include <concurrent_unordered_set.h>
 #include "Point.h"
+#define PARALLEL
 
 using namespace std;
+using namespace concurrency;
+
 Point* LoadPoint(const char*, unsigned int&);
 
 int main()
@@ -26,58 +30,41 @@ int main()
 	end = std::chrono::steady_clock::now();//紀錄讀檔結束時間
 	std::cout << "Time " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
 	std::cout << "Number of point " << nPoint << std::endl;
-
+		
 	start = std::chrono::steady_clock::now();//紀錄移除重複點開始時間
-	unsigned int count = 0;
-	map<float, map<float, set<float>>> point_map;
-	
-	for (auto it = point_array; it < point_array + nPoint; it++)
-	{
-		auto map_itx = point_map.find(it->x);
-		if (map_itx == point_map.end())
-		{
-			set<float> z;
-			z.insert(it->z);
 
-			map<float, set<float>> y;
-			pair<float, set<float>> py(it->y, z);
-			y.insert(py);
-
-			pair<float, map<float, set<float>>> px(it->x, y);
-			point_map.insert(px);
-			count++;
-		}
-		else
-		{
-			auto map_ity = map_itx->second.find(it->y);
-			if (map_ity == map_itx->second.end())
-			{
-				set<float> z;
-				z.insert(it->z);				
-				pair<float, set<float>> py(it->y, z);
-				map_itx->second.insert(py);
-				count++;
-			}
-			else
-			{
-				auto map_itz = map_ity->second.find(it->z);
-				if (map_itz == map_ity->second.end())
-				{			
-					map_ity->second.insert(it->z);
-					count++;
-				}
-			}
-		}
-
-	}
+#ifdef PARALLEL
+	concurrent_unordered_set<Point> point_set;
+	parallel_for_each(point_array, point_array + nPoint, [&point_set](Point &p){
+		
+#else
+	unordered_set<Point> point_set;
+	for (auto it = point_array; it < point_array + nPoint; it++){
+		Point p = *it;		
+#endif
+	if (point_set.find(p) == point_set.end())
+		point_set.insert(p);
+}
+#ifdef PARALLEL
+);
+#endif
 
 	end = std::chrono::steady_clock::now();//紀錄移除重複點結束時間
 
 	std::cout << "Time " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
-	std::cout << count << std::endl;
+	std::cout << point_set.size() << std::endl;
 
 	//在此加入寫檔程式碼
-
+	cout << "Start write file...\n";
+	ofstream outFile;
+	outFile.open("OutPoint.txt");
+	int count = 0;
+	for (auto p : point_set)
+	{
+		outFile << p << endl;
+		count++;
+	}
+	cout << "End write file\n";
 	delete[]point_array;
 	system("pause");
 	return 0;

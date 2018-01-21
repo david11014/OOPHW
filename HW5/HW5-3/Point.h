@@ -77,13 +77,17 @@ public:
 	friend inline bool operator!=(const Point &a, const Point &b) {
 		return !(a==b);
 	}
+	friend inline bool operator<(const Point &a, const Point &b) {
 
-	float Distant(Point P)
+		return (a.Abs() < b.Abs());
+	}
+
+	float Distant(Point P) const
 	{
 		return sqrt((p[0] - P[0])*(p[0] - P[0]) + (p[1] - P[1])*(p[1] - P[1]) + (p[2] - P[2])*(p[2] - P[2]));
 	}
 
-	float Abs()
+	float Abs() const
 	{
 		return sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
 	}
@@ -114,15 +118,6 @@ public:
 
 	}
 
-	size_t hash()
-	{
-		size_t hx = std::hash<float>()(x);
-		size_t hy = std::hash<float>()(y);
-		size_t hz = std::hash<float>()(z);
-
-		return ((hx ^ (hy << 1)) >> 1) ^ (hz << 1);
-	}
-
 	friend ostream& operator<<(ostream& os, const Point& p);
 
 };
@@ -139,13 +134,8 @@ namespace std
 	template <>
 	struct hash<Point>
 	{
-		size_t operator()(Point& k) const
+		size_t operator()(const Point& k) const
 		{
-			//double x, y, z;
-			//x = k.x;
-			//y = k.y;
-			//z = k.z;
-
 			size_t hx = hash<float>()(k.x);
 			size_t hy = hash<float>()(k.y);
 			size_t hz = hash<float>()(k.z);
