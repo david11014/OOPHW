@@ -76,7 +76,7 @@ int main()
 		cout << "Please enter the point:" << endl;
 		cin >> testP;
 
-		if (ABS(testP[0]) > RANGE || ABS(testP[1]) > RANGE)
+		if ((ABS(testP[0])) > RANGE || (ABS(testP[1])) > RANGE)
 			cout << "Point out of range!" << endl;
 		else
 		{

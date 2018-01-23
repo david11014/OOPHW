@@ -27,7 +27,7 @@ int main()
 
 	auto outint_lb = [](int n) { std::cout << n << " "; };
 	auto f100_lb = [&f100](int n) {return f100(n);};
-	auto constructer_lb = [](int n) {return TooBig<int>(200)(n); };
+	
 
 	// C++0x can use the following instead
 	//  list<int> yadayada = {50, 100, 90, 180, 60, 210, 415, 88, 188, 201};
@@ -39,7 +39,7 @@ int main()
 	for_each(etcetera.begin(), etcetera.end(), outint_lb);
 	std::cout << std::endl;
 	yadayada.remove_if(f100_lb);               // use a named function object
-	etcetera.remove_if(constructer_lb);   // construct a function object
+	etcetera.remove_if([](int n) {return TooBig<int>(200)(n); });   // construct a function object
 	std::cout << "Trimmed lists:\n";
 	for_each(yadayada.begin(), yadayada.end(), outint_lb);
 	std::cout << std::endl;

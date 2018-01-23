@@ -166,7 +166,13 @@ Point QuadtreeNode::FindClosestPoint(const Point & p) const //#18
 		else if (p[0] > separate_point[0] && p[1] < separate_point[1]) //3
 			i = 3;
 
-		return nextNode[i]->FindClosestPoint(p);
+		if (nextNode[i] == nullptr)
+		{
+			cout << "Node no Point!\n";
+			return Point(0, 0);
+		}			
+		else
+			return nextNode[i]->FindClosestPoint(p);
 	}
 	else
 		return *data;
